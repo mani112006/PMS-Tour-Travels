@@ -144,48 +144,27 @@
       showMsg('');
     }
 
-    async function updateStatus(id, status) {
+   async function updateStatus(id, status) {
   const label = status === 'confirmed' ? 'Confirm' : 'Reject';
+
   if (!confirm(`${label} this booking?`)) return;
 
-  const { data: booking, error: fetchError } =
-    await supabaseClient.from('Booking').select('*').eq('id', id).single();
+  const { error } = await supabaseClient
+    .from('Booking')
+    .update({ status })
+    .eq('id', id);
 
-  if (fetchError || !booking) {
-    showMsg('Could not load booking details.', true);
-    return;
-  }
-
-  const oldStatus = booking.status || 'pending';
-
-  const { error: updateError } =
-    await supabaseClient.from('Booking').update({ status }).eq('id', id);
-
-  if (updateError) {
-    showMsg(updateError.message || 'Status update failed.', true);
-    return;
-  }
-
-  const { error: historyError } =
-    await supabaseClient.from('Booking_History').insert([{
-      booking_id: booking.id,
-      booking_code: booking.booking_code,
-      customer_name: booking.customer_name,
-      action: label,
-      old_status: oldStatus,
-      new_status: status
-    }]);
-
-  if (historyError) {
-    showMsg('Booking updated, but history could not be saved.', true);
-    await loadBookings();
+  if (error) {
+    showMsg(error.message || 'Status update failed.', true);
     return;
   }
 
   await loadBookings();
-  showMsg(`Booking ${label.toLowerCase()}ed and saved in History.`);
-}
 
+  showMsg(
+    `Booking ${label.toLowerCase()}ed. Use the WhatsApp button to send the customer the ready-made message.`
+  );
+}
     list.addEventListener('click', async e => {
       const wa = e.target.closest('button[data-wa-status]');
       if (wa) {
