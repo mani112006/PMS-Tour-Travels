@@ -42,10 +42,7 @@
     function esc(value) {
       return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     }
-    function esc(value) {
-  ...
-}
-
+    
 function formatTime(time) {
   if (!time) return '';
   const [hour, minute] = time.split(':');
