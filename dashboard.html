@@ -42,6 +42,22 @@
     function esc(value) {
       return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     }
+    function esc(value) {
+  ...
+}
+
+function formatTime(time) {
+  if (!time) return '';
+  const [hour, minute] = time.split(':');
+  const h = Number(hour);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${minute} ${suffix}`;
+}
+
+function showMsg(text, bad=false) {
+  ...
+}
     function showMsg(text, bad=false) {
       msg.textContent = text || '';
       msg.className = 'message' + (bad ? ' error' : '');
@@ -127,7 +143,7 @@
             <div><b>Pickup</b><span>${esc(r.pickup_location)}</span></div>
             <div><b>Drop</b><span>${esc(r.drop_location)}</span></div>
             <div><b>Date</b><span>${esc(r.start_date)}</span></div>
-            <div><b>Time</b><span>${esc(r.start_time)}</span></div>
+            <div><b>Time</b><span>${formatTime(r.start_time)}</span></div>
             <div><b>Passengers</b><span>${esc(r.passengers)}</span></div>
             <div><b>Service</b><span>${esc(r.service_type)}</span></div>
             <div class="wide"><b>Destinations</b><span>${esc(r.destinations)}</span></div>
