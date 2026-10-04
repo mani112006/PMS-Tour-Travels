@@ -52,9 +52,6 @@ function formatTime(time) {
   return `${hour12}:${minute} ${suffix}`;
 }
 
-function showMsg(text, bad=false) {
-  ...
-}
     function showMsg(text, bad=false) {
       msg.textContent = text || '';
       msg.className = 'message' + (bad ? ' error' : '');
