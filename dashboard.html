@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PMS Owner Dashboard</title>
+  <link rel="stylesheet" href="owner.css">
+</head>
+<body class="dashboard-page">
+  <header class="topbar">
+    <div><strong>PMS TOUR &amp; TRAVELS</strong><span>Owner Dashboard</span></div>
+    <div class="top-actions"><span id="ownerEmail"></span><button id="logoutBtn" class="secondary">Logout</button></div>
+  </header>
+
+  <main class="dashboard-wrap">
+    <section class="stats">
+      <div class="stat"><span>Total</span><strong id="totalCount">0</strong></div>
+      <div class="stat pending"><span>Pending</span><strong id="pendingCount">0</strong></div>
+      <div class="stat confirmed"><span>Confirmed</span><strong id="confirmedCount">0</strong></div>
+      <div class="stat rejected"><span>Rejected</span><strong id="rejectedCount">0</strong></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h1>Booking Requests</h1>
+        <button id="refreshBtn" class="secondary">↻ Refresh</button>
+      </div>
+      <p id="dashMessage" class="message"></p>
+      <div id="bookings" class="booking-list"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-config.js"></script>
+  <script>
+    const OWNER_EMAIL = 'pmstravels@gmail.com';
+    const { createClient } = window.supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    const list = document.getElementById('bookings');
+    const msg = document.getElementById('dashMessage');
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+    function showMsg(text, bad=false) {
+      msg.textContent = text || '';
+      msg.className = 'message' + (bad ? ' error' : '');
+    }
+    function statusClass(s) { return String(s || 'pending').toLowerCase(); }
+
+    function whatsappNumber(phone) {
+      let digits = String(phone || '').replace(/\D/g, '');
+      if (digits.length === 10) digits = '91' + digits;
+      return digits;
+    }
+
+    function bookingMessage(r, status) {
+      const code = r.booking_code || ('Booking #' + r.id);
+      const customer = r.customer_name || 'Customer';
+      if (status === 'confirmed') {
+        return `Hello ${customer},\n\nYour PMS Tour & Travels booking request has been CONFIRMED. ✅\n\nBooking ID: ${code}\nTrip: ${r.trip_type || '-'}\nPickup: ${r.pickup_location || '-'}\nDrop: ${r.drop_location || '-'}\nDate: ${r.start_date || '-'}\nTime: ${r.start_time || '-'}\nPassengers: ${r.passengers || '-'}\n\nThank you for choosing PMS Tour & Travels.\nYOUR JOURNEY | OUR PRIORITY`;
+      }
+      return `Hello ${customer},\n\nYour PMS Tour & Travels booking request has been REJECTED. ❌\n\nBooking ID: ${code}\nTrip: ${r.trip_type || '-'}\nPickup: ${r.pickup_location || '-'}\nDrop: ${r.drop_location || '-'}\nDate: ${r.start_date || '-'}\n\nPlease contact PMS Tour & Travels at 8940366879 if you need any clarification.\nThank you.`;
+    }
+
+    function openWhatsApp(r, status) {
+      const number = whatsappNumber(r.phone);
+      if (!number || number.length < 10) {
+        showMsg('Customer WhatsApp number is invalid.', true);
+        return;
+      }
+      const message = status ? bookingMessage(r, status) : `Hello ${r.customer_name || 'Customer'}, this is PMS Tour & Travels regarding your booking ${r.booking_code || ('#' + r.id)}.`;
+      window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    }
+
+    async function guard() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const email = session?.user?.email?.toLowerCase();
+      if (!session || email !== OWNER_EMAIL) {
+        await supabaseClient.auth.signOut();
+        location.href = 'login.html';
+        return false;
+      }
+      document.getElementById('ownerEmail').textContent = email;
+      return true;
+    }
+
+    async function loadBookings() {
+      showMsg('Loading bookings...');
+      const { data, error } = await supabaseClient.from('Booking').select('*').order('created_at', { ascending: false });
+      if (error) {
+        showMsg(error.message || 'Could not load bookings.', true);
+        list.innerHTML = '';
+        return;
+      }
+
+      const rows = data || [];
+      document.getElementById('totalCount').textContent = rows.length;
+      document.getElementById('pendingCount').textContent = rows.filter(r => r.status === 'pending').length;
+      document.getElementById('confirmedCount').textContent = rows.filter(r => r.status === 'confirmed').length;
+      document.getElementById('rejectedCount').textContent = rows.filter(r => r.status === 'rejected').length;
+
+      if (!rows.length) {
+        list.innerHTML = '<div class="empty">No booking requests yet.</div>';
+        showMsg('');
+        return;
+      }
+
+      list.innerHTML = rows.map(r => {
+        const waAction = r.status === 'confirmed'
+          ? `<button class="wa" data-wa-status="confirmed" data-id="${r.id}">✓ Send Confirmation WhatsApp</button>`
+          : r.status === 'rejected'
+            ? `<button class="wa" data-wa-status="rejected" data-id="${r.id}">✕ Send Rejection WhatsApp</button>`
+            : `<button class="wa" data-wa-status="" data-id="${r.id}">WhatsApp Customer</button>`;
+
+        return `
+        <article class="booking-card">
+          <div class="booking-head">
+            <div><strong>${esc(r.booking_code || ('Booking #' + r.id))}</strong><div class="small">${esc(r.created_at ? new Date(r.created_at).toLocaleString('en-IN') : '')}</div></div>
+            <span class="badge ${statusClass(r.status)}">${esc(r.status || 'pending')}</span>
+          </div>
+          <div class="grid">
+            <div><b>Customer</b><span>${esc(r.customer_name)}</span></div>
+            <div><b>Phone</b><span>${esc(r.phone)}</span></div>
+            <div><b>Trip</b><span>${esc(r.trip_type)}</span></div>
+            <div><b>Days</b><span>${esc(r.number_of_days ?? '')}</span></div>
+            <div><b>Pickup</b><span>${esc(r.pickup_location)}</span></div>
+            <div><b>Drop</b><span>${esc(r.drop_location)}</span></div>
+            <div><b>Date</b><span>${esc(r.start_date)}</span></div>
+            <div><b>Time</b><span>${esc(r.start_time)}</span></div>
+            <div><b>Passengers</b><span>${esc(r.passengers)}</span></div>
+            <div><b>Service</b><span>${esc(r.service_type)}</span></div>
+            <div class="wide"><b>Destinations</b><span>${esc(r.destinations)}</span></div>
+            <div class="wide"><b>Additional details</b><span>${esc(r.additional_details)}</span></div>
+          </div>
+          <div class="actions">
+            <a class="call" href="tel:${encodeURIComponent(r.phone || '')}">📞 Call</a>
+            ${waAction}
+            ${r.status === 'pending' ? `<button class="confirm" data-id="${r.id}" data-status="confirmed">✓ Confirm</button><button class="reject" data-id="${r.id}" data-status="rejected">✕ Reject</button>` : ''}
+          </div>
+        </article>`;
+      }).join('');
+
+      showMsg('');
+    }
+
+    async function updateStatus(id, status) {
+      const label = status === 'confirmed' ? 'Confirm' : 'Reject';
+      if (!confirm(`${label} this booking?`)) return;
+
+      const { error } = await supabaseClient.from('Booking').update({ status }).eq('id', id);
+      if (error) {
+        showMsg(error.message || 'Status update failed.', true);
+        return;
+      }
+
+      await loadBookings();
+      showMsg(`Booking ${label.toLowerCase()}ed. Use the WhatsApp button to send the customer the ready-made message.`);
+    }
+
+    list.addEventListener('click', async e => {
+      const wa = e.target.closest('button[data-wa-status]');
+      if (wa) {
+        const id = wa.dataset.id;
+        const status = wa.dataset.waStatus;
+        const { data, error } = await supabaseClient.from('Booking').select('*').eq('id', id).single();
+        if (error || !data) {
+          showMsg('Could not load booking for WhatsApp.', true);
+          return;
+        }
+        openWhatsApp(data, status || null);
+        return;
+      }
+
+      const b = e.target.closest('button[data-id][data-status]');
+      if (b) updateStatus(b.dataset.id, b.dataset.status);
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', loadBookings);
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      location.href = 'login.html';
+    });
+
+    (async () => {
+      if (await guard()) await loadBookings();
+    })();
+  </script>
+</body>
+</html>
