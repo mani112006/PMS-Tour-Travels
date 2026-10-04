@@ -1,1 +1,239 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#071a3d"><link rel="stylesheet" href="style.css"><link rel="icon" href="assets/pms-logo.png"><title>PMS Tour & Travels | Book Your Ride</title><meta name="description" content="PMS Tour & Travels — Your Journey | Our Priority"></head><body><header><nav class="container"><a href="index.html"><img class="brand-mark" src="assets/pms-logo.png" alt="PMS Tour & Travels logo"></a><div class="links"><a href="services.html">Services</a><a href="about.html">About</a><a href="areas.html">Areas</a><a href="gallery.html">Gallery</a><a href="booking.html">Book Now</a><a class="nav-cta" href="tel:+918940366879">Call Now</a></div><a class="nav-cta mobile-menu" href="booking.html">Book</a></nav></header><main><section class="page-hero"><div class="container"><h1>Book Your Ride</h1><p>Fill in your trip details. Your booking request will open directly in WhatsApp for PMS to confirm availability, vehicle and fare.</p></div></section><section><div class="container booking"><div class="booking-info"><h2>Plan Your Trip</h2><p>Give us your pickup, destination, date and time. We will respond through WhatsApp.</p><div class="contact-box">Call / WhatsApp<br><strong>8940366879</strong></div><div class="contact-box">Service Areas<br><strong style="font-size:17px">All Tamil Nadu • Tourist Destinations • Kerala & Nearby States</strong><br><span style="color:#cfe0fb">Pickup & Drop available as per your preferred location</span></div></div><form id="bookingForm"><label>Full Name<input id="name" required placeholder="Your name"></label><label>Phone Number<input id="phone" required type="tel" placeholder="Your mobile number"></label><label>Pickup Location<input id="pickup" required placeholder="Pickup point"></label><label>Drop Location<input id="drop" required placeholder="Destination"></label><label>Date<input id="date" required type="date"></label><label>Time<input id="time" required type="time"></label><label>Service<select id="service"><option>Local Trip</option><option>Outstation Trip</option><option>Airport Transfer</option><option>Family & Group Travel</option><option>Customized Package</option></select></label><label>Passengers<input id="passengers" type="number" min="1" value="1"></label><label class="full">Additional Details<textarea id="details" placeholder="Vehicle preference, luggage, return trip, special request..."></textarea></label><button class="submit" type="submit">Send Booking Request on WhatsApp →</button></form></div></section><script>document.getElementById('bookingForm').addEventListener('submit',function(e){e.preventDefault();const v=id=>document.getElementById(id).value.trim();const msg=`PMS TOUR & TRAVELS - BOOKING REQUEST%0A%0AName: ${v('name')}%0APhone: ${v('phone')}%0APickup: ${v('pickup')}%0ADrop: ${v('drop')}%0ADate: ${v('date')}%0ATime: ${v('time')}%0AService: ${v('service')}%0APassengers: ${v('passengers')}%0ADetails: ${v('details')||'None'}`;window.open(`https://wa.me/918940366879?text=${msg}`,'_blank')});</script></main><footer><div class="container footer-grid"><div><div class="footer-brand">PMS <span>TOUR & TRAVELS</span></div><p>Your Journey | Our Priority<br>Local • Outstation • Airport • Family & Group Travel</p></div><div><h4>Quick Links</h4><p><a href="index.html">Home</a><br><a href="services.html">Services</a><br><a href="about.html">About PMS</a><br><a href="areas.html">Service Areas</a><br><a href="gallery.html">Gallery</a><br><a href="booking.html">Book Now</a></p></div><div><h4>Contact</h4><p>📞 <a href="tel:+918940366879">8940366879</a><br>💬 <a href="https://wa.me/918940366879" target="_blank">WhatsApp</a><br>📍 Tamil Nadu • Tourist Destinations • Kerala & Nearby States</p></div></div><div class="container footer-bottom">© <span id="year"></span> PMS Tour & Travels. All rights reserved.</div></footer><script>document.getElementById('year').textContent=new Date().getFullYear();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071a3d">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="assets/pms-logo.png">
+<title>PMS Tour & Travels | Book Your Ride</title>
+<meta name="description" content="PMS Tour & Travels — Your Journey | Our Priority">
+</head>
+<body>
+<header><nav class="container">
+<a href="index.html"><img class="brand-mark" src="assets/pms-logo.png" alt="PMS Tour & Travels logo"></a>
+<div class="links">
+<a href="services.html">Services</a><a href="about.html">About</a><a href="areas.html">Areas</a>
+<a href="gallery.html">Gallery</a><a href="booking.html">Book Now</a><a class="nav-cta" href="tel:+918940366879">Call Now</a>
+</div>
+<a class="nav-cta mobile-menu" href="booking.html">Book</a>
+</nav></header>
+
+<main>
+<section class="page-hero">
+<div class="container">
+<h1>Book Your Ride</h1>
+<p>Send your trip details to PMS Tour & Travels. Your booking request will be securely saved and assigned a Booking ID.</p>
+</div>
+</section>
+
+<section>
+<div class="container booking">
+<div class="booking-info">
+<h2>Plan Your Trip</h2>
+<p>Tell us your pickup, destinations, travel dates and passenger details. We will review your request and confirm availability.</p>
+<div class="contact-box">Call / WhatsApp<br><strong>8940366879</strong></div>
+<div class="contact-box">Service Areas<br><strong style="font-size:17px">All Tamil Nadu • Tourist Destinations • Kerala & Nearby States</strong><br><span style="color:#cfe0fb">Pickup & Drop available as per your preferred location</span></div>
+<div class="contact-box"><strong style="font-size:18px">Booking Status</strong><br><span style="color:#cfe0fb">After submission, your request will start as <b>Pending</b>. PMS will confirm it after review.</span></div>
+</div>
+
+<form id="bookingForm">
+<label>Full Name<input id="name" required placeholder="Your name"></label>
+<label>Phone / WhatsApp<input id="phone" required type="tel" inputmode="tel" placeholder="Your mobile number"></label>
+
+<label>Trip Type
+<select id="trip_type" required>
+<option value="One Way">One Way</option>
+<option value="Round Trip">Round Trip</option>
+<option value="Multi-Day Tour">Multi-Day Tour</option>
+</select>
+</label>
+
+<label>Number of Days
+<select id="number_of_days" required>
+<option value="1">1 Day</option><option value="2">2 Days</option><option value="3">3 Days</option>
+<option value="4">4 Days</option><option value="5">5 Days</option><option value="6">6 Days</option>
+<option value="7">7 Days</option><option value="8-15">8–15 Days</option><option value="15+">15+ Days</option>
+</select>
+</label>
+
+<label>Pickup Location<input id="pickup" required placeholder="Example: Ariyalur"></label>
+<label>Final Drop Location<input id="drop" required placeholder="Final destination / return drop"></label>
+
+<label>Starting Date<input id="date" required type="date"></label>
+<label>Starting Time<input id="time" required type="time"></label>
+
+<label>Passengers<input id="passengers" required type="number" min="1" value="1"></label>
+
+<label>Service
+<select id="service" required>
+<option>Local Trip</option>
+<option>Airport Transfer</option>
+<option>Outstation Trip</option>
+<option>Family & Group Travel</option>
+<option>Multi-Day Tour</option>
+<option>Customized Tour</option>
+</select>
+</label>
+
+<label class="full">Tour Destinations / Places You Want to Visit
+<input id="destinations" placeholder="Example: Kodaikanal, Munnar, Thekkady"></label>
+
+<label class="full">Additional Details
+<textarea id="details" placeholder="Vehicle preference, luggage, hotel requirement, sightseeing places, return trip, special requests..."></textarea>
+</label>
+
+<button class="submit" id="submitBtn" type="button">Send Book Request →</button>
+<p id="bookingMessage" class="full" style="margin:0;font-weight:800;text-align:center;"></p>
+</form>
+</div>
+</section>
+</main>
+
+<footer><div class="container footer-grid">
+<div><div class="footer-brand">PMS <span>TOUR & TRAVELS</span></div><p>Your Journey | Our Priority<br>Local • Outstation • Airport • Family & Group Travel</p></div>
+<div><h4>Quick Links</h4><p><a href="index.html">Home</a><br><a href="services.html">Services</a><br><a href="about.html">About PMS</a><br><a href="areas.html">Service Areas</a><br><a href="gallery.html">Gallery</a><br><a href="booking.html">Book Now</a></p></div>
+<div><h4>Contact</h4><p>📞 <a href="tel:+918940366879">8940366879</a><br>💬 <a href="https://wa.me/918940366879" target="_blank" rel="noopener">WhatsApp</a><br>📍 Tamil Nadu • Tourist Destinations • Kerala & Nearby States</p></div>
+</div><div class="container footer-bottom">© <span id="year"></span> PMS Tour & Travels. All rights reserved.</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+(() => {
+  const form = document.getElementById('bookingForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const message = document.getElementById('bookingMessage');
+  const year = document.getElementById('year');
+
+  if (year) year.textContent = new Date().getFullYear();
+
+  // IMPORTANT: The button is type="button", not type="submit".
+  // This prevents the browser from doing a normal form submission/reload if
+  // a CDN/configuration error happens before Supabase is initialized.
+  const val = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  };
+
+  function showMessage(text, color) {
+    message.textContent = text;
+    message.style.color = color;
+  }
+
+  function makeBookingCode() {
+    const d = new Date();
+    const date = d.getFullYear().toString()
+      + String(d.getMonth() + 1).padStart(2, '0')
+      + String(d.getDate()).padStart(2, '0');
+    const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+    return `PMS-${date}-${random}`;
+  }
+
+  function isConfigReady() {
+    return typeof SUPABASE_URL === 'string'
+      && typeof SUPABASE_PUBLISHABLE_KEY === 'string'
+      && SUPABASE_URL.length > 0
+      && SUPABASE_PUBLISHABLE_KEY.length > 0
+      && !SUPABASE_URL.includes('PASTE_')
+      && !SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
+  }
+
+  let supabaseClient = null;
+
+  try {
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      showMessage('Booking system could not load. Please refresh the page or open the live Vercel website.', '#b42318');
+      console.error('Supabase JavaScript library failed to load.');
+    } else if (!isConfigReady()) {
+      showMessage('Booking system configuration is incomplete. Please update supabase-config.js.', '#b42318');
+      console.error('Supabase URL/publishable key is missing.');
+    } else {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    }
+  } catch (initError) {
+    console.error('Supabase initialization error:', initError);
+    showMessage('Booking system could not start. Please refresh and try again.', '#b42318');
+  }
+
+  submitBtn.addEventListener('click', async () => {
+    // No native form submission/reload can happen from this button.
+    message.textContent = '';
+    message.style.color = '';
+
+    if (!supabaseClient) {
+      showMessage('Booking system is not connected. Please check supabase-config.js and try again.', '#b42318');
+      return;
+    }
+
+    // Validate required fields manually because the button is type="button".
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      showMessage('Please fill all required details before sending the booking request.', '#b42318');
+      return;
+    }
+
+    const phone = val('phone').replace(/\D/g, '');
+    if (phone.length < 10) {
+      showMessage('Please enter a valid 10-digit mobile / WhatsApp number.', '#b42318');
+      document.getElementById('phone').focus();
+      return;
+    }
+
+    const passengers = Number(val('passengers'));
+    if (!Number.isInteger(passengers) || passengers < 1) {
+      showMessage('Please enter at least 1 passenger.', '#b42318');
+      document.getElementById('passengers').focus();
+      return;
+    }
+
+    const daysRaw = val('number_of_days');
+    const bookingCode = makeBookingCode();
+    const payload = {
+      customer_name: val('name'),
+      phone: val('phone'),
+      trip_type: val('trip_type'),
+      number_of_days: /^\d+$/.test(daysRaw) ? Number(daysRaw) : null,
+      pickup_location: val('pickup'),
+      drop_location: val('drop'),
+      start_date: val('date'),
+      start_time: val('time'),
+      passengers,
+      service_type: val('service'),
+      destinations: val('destinations'),
+      additional_details: val('details'),
+      booking_code: bookingCode
+    };
+
+    if (!/^\d+$/.test(daysRaw)) {
+      payload.additional_details = `Number of days: ${daysRaw}\n${payload.additional_details}`.trim();
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending Booking Request...';
+
+    try {
+      // Do not call .select() here. Public customers only need INSERT access;
+      // reading the inserted row would require a SELECT policy.
+      const { error } = await supabaseClient
+        .from('Booking')
+        .insert(payload);
+
+      if (error) throw error;
+
+      showMessage('', '#087443');
+      message.innerHTML = `Booking request submitted successfully!<br>Booking ID: <strong>${bookingCode}</strong><br>Status: <strong>Pending</strong>`;
+      form.reset();
+      document.getElementById('passengers').value = 1;
+    } catch (error) {
+      console.error('Supabase booking error:', error);
+      const detail = error && error.message ? error.message : 'Please try again or call 8940366879.';
+      showMessage(`Booking could not be submitted. ${detail}`, '#b42318');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Book Request →';
+    }
+  });
+})();
+</script>
+</body>
+</html>

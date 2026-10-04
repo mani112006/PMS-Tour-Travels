@@ -1,0 +1,35 @@
+PMS Tour & Travels - Supabase Booking Integration (V9)
+
+WHAT IS FIXED IN V9
+- Send Book Request is type=button, so the browser will NOT reload the booking page.
+- Required fields are validated manually.
+- Supabase initialization errors are shown on the same page.
+- Booking insert errors are shown on the same page.
+- Successful bookings show Booking ID and Pending status.
+- The INSERT request does not call SELECT, so a public SELECT policy is not required.
+- Existing website assets/images are included.
+
+SETUP
+1. Open supabase-config.js.
+2. Replace SUPABASE_URL with your Supabase Project URL.
+3. Replace SUPABASE_PUBLISHABLE_KEY with your Supabase Publishable key.
+4. Save the file. Do NOT double-click the .js file.
+5. Upload the complete website folder to GitHub and let Vercel deploy it.
+6. Test the booking page from the live Vercel URL.
+
+DATABASE
+Expected table: public.Booking
+Columns:
+id, created_at, customer_name, phone, trip_type, number_of_days, pickup_location,
+drop_location, start_date, start_time, passengers, service_type, destinations,
+additional_details, status, booking_code
+
+RLS
+- RLS should be enabled on Booking.
+- An INSERT policy for role anon with WITH CHECK = true is required for public booking submissions.
+- Do not create a public SELECT policy just to make booking submission work.
+
+IMPORTANT
+- This version saves the booking to Supabase.
+- Automatic WhatsApp delivery/Accept/Reject is NOT included yet. That requires a secure backend/Edge Function and Meta WhatsApp Business Platform API.
+- Never put a Supabase Secret/service_role key in browser files.
