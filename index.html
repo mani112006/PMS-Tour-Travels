@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PMS Tour & Travels | Ariyalur | Local, Outstation & Airport Travel</title>
+  <meta name="description" content="PMS Tour & Travels — comfortable local, outstation, airport transfer and family/group travel. Book your ride today.">
+  <meta name="theme-color" content="#071a3d">
+  <meta property="og:title" content="PMS Tour & Travels">
+  <meta property="og:description" content="Your Journey | Our Priority">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/pms-hero.png">
+  <style>
+    :root{--navy:#071a3d;--blue:#075be6;--gold:#f6c533;--white:#fff;--muted:#64748b;--bg:#f7faff;--line:#dce7f7}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#10213f;background:var(--bg)}
+    a{text-decoration:none;color:inherit}.container{width:min(1160px,92%);margin:auto}
+    header{position:sticky;top:0;z-index:20;background:rgba(7,26,61,.96);backdrop-filter:blur(10px);color:#fff;border-bottom:1px solid rgba(255,255,255,.12)}
+    nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.5px}.brand-mark{width:78px;height:42px;object-fit:contain;border-radius:6px;background:#fff;padding:2px}.brand span{color:var(--gold)}
+    .links{display:flex;gap:22px;align-items:center;font-size:14px}.links a:hover{color:var(--gold)}.nav-cta{padding:11px 16px;border-radius:999px;background:var(--gold);color:var(--navy);font-weight:800}
+    .hero{position:relative;min-height:620px;display:flex;align-items:center;overflow:hidden;background:linear-gradient(115deg,#061631 0%,#0a2b65 48%,#0c6eea 100%);color:#fff}
+    .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 75% 35%,rgba(255,255,255,.18),transparent 35%);pointer-events:none}
+    .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;position:relative;z-index:1}.eyebrow{color:var(--gold);font-weight:900;letter-spacing:2px;text-transform:uppercase;font-size:13px}
+    h1{font-size:clamp(42px,6vw,72px);line-height:.98;margin:12px 0 18px}.hero h1 span{color:var(--gold)}.hero p{font-size:18px;line-height:1.65;color:#dbe9ff;max-width:600px}
+    .buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 20px;border-radius:12px;font-weight:900;border:1px solid rgba(255,255,255,.22);cursor:pointer}.btn-primary{background:var(--gold);color:var(--navy);border-color:var(--gold)}.btn-dark{background:#fff;color:var(--navy)}
+    .hero-card{background:#fff;border-radius:28px;padding:12px;box-shadow:0 30px 80px rgba(0,0,0,.3)}.hero-card img{width:100%;display:block;border-radius:20px}
+    section{padding:76px 0}.section-head{text-align:center;max-width:760px;margin:0 auto 38px}.section-head h2{font-size:38px;margin:0 0 10px;color:var(--navy)}.section-head p{color:var(--muted);line-height:1.7}
+    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 10px 30px rgba(15,48,92,.06)}.icon{font-size:30px}.card h3{margin:12px 0 7px}.card p{color:var(--muted);line-height:1.55;font-size:14px}
+    .dark{background:var(--navy);color:#fff}.dark .section-head h2{color:#fff}.dark .section-head p{color:#bcd0ef}.dark .card{background:#0d2854;border-color:#173d75;color:#fff}.dark .card p{color:#c2d2eb}
+    .about{display:grid;grid-template-columns:1fr 1fr;gap:42px;align-items:center}.about img{width:100%;border-radius:24px;box-shadow:0 20px 50px rgba(15,48,92,.16)}.about h2{font-size:42px;color:var(--navy);margin:0 0 14px}.about p{line-height:1.8;color:var(--muted)}
+    .ticks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.tick{font-weight:800}.tick:before{content:"✓";display:inline-grid;place-items:center;width:24px;height:24px;background:var(--gold);color:var(--navy);border-radius:50%;margin-right:8px}
+    .booking{display:grid;grid-template-columns:.8fr 1.2fr;gap:26px;align-items:stretch}.booking-info{background:linear-gradient(145deg,#071a3d,#0b57c9);color:#fff;border-radius:24px;padding:34px}.booking-info h2{font-size:38px;margin:0 0 10px}.booking-info p{color:#cfe0fb;line-height:1.7}.contact-box{margin-top:24px;padding:18px;border:1px solid rgba(255,255,255,.16);border-radius:16px}.contact-box strong{font-size:24px;color:var(--gold)}
+    form{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px;box-shadow:0 14px 40px rgba(15,48,92,.07)}label{font-weight:800;font-size:13px;color:var(--navy)}input,select,textarea{width:100%;margin-top:7px;border:1px solid #ccd9eb;border-radius:11px;padding:13px;font:inherit;background:#fbfdff}textarea{min-height:100px;resize:vertical}.full{grid-column:1/-1}.submit{grid-column:1/-1;border:0;background:var(--blue);color:#fff;font-weight:900;padding:15px;border-radius:12px;font-size:16px;cursor:pointer}
+    .gallery{display:grid;grid-template-columns:2fr 1fr;gap:18px}.gallery img{width:100%;height:100%;object-fit:cover;border-radius:18px;border:1px solid var(--line)}.gallery .large{min-height:360px}.gallery .small{min-height:170px}
+    .cta{background:linear-gradient(90deg,#071a3d,#075be6);color:#fff;border-radius:28px;padding:36px;display:flex;justify-content:space-between;align-items:center;gap:24px}.cta h2{margin:0;font-size:34px}.cta p{color:#dbe9ff;margin:8px 0 0}
+    footer{background:#041127;color:#d7e4f8;padding:44px 0 24px}.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px}.footer-brand{font-size:25px;font-weight:900;color:#fff}.footer-brand span{color:var(--gold)}footer p{line-height:1.7;color:#9fb4d4}footer h4{color:#fff;margin-top:0}.footer-bottom{border-top:1px solid #183052;margin-top:30px;padding-top:18px;font-size:13px;color:#8fa7c8}
+    .lang{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;padding:9px 10px;border-radius:9px}.mobile-menu{display:none}
+    @media(max-width:900px){.hero-grid,.about,.booking{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.links{display:none}.mobile-menu{display:block}.hero{padding:65px 0}.gallery{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}.cta{display:block}.cta .btn{margin-top:18px}}
+    @media(max-width:560px){.grid{grid-template-columns:1fr}form{grid-template-columns:1fr}.full,.submit{grid-column:auto}.ticks{grid-template-columns:1fr}.hero-card{order:-1}.nav-cta{display:none}h1{font-size:48px}.section-head h2,.about h2{font-size:32px}}
+  </style>
+</head>
+<body>
+<header>
+  <nav class="container">
+    <a class="brand" href="#home"><img class="brand-mark" src="assets/pms-logo.png" alt="PMS Tour & Travels logo"></a>
+    <div class="links">
+      <a href="#services">Services</a><a href="#about">About</a><a href="#service-areas">Areas</a><a href="#gallery">Gallery</a><a href="#booking">Book Now</a>
+      <button class="lang" onclick="toggleLang()">தமிழ் / EN</button>
+      <a class="nav-cta" href="tel:+918940366879">Call Now</a>
+    </div>
+    <a class="nav-cta mobile-menu" href="#booking">Book</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero" id="home">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow" data-en="Your Journey | Our Priority" data-ta="உங்கள் பயணம் | எங்கள் முன்னுரிமை">Your Journey | Our Priority</div>
+      <h1><span>PMS</span><br>Tour & Travels</h1>
+      <p data-en="Comfortable, safe and reliable travel for local trips, outstation journeys, airport transfers, families, groups and customized travel plans." data-ta="Local trip, outstation journey, airport transfer, family & group travel மற்றும் customized travel packages — பாதுகாப்பான, நம்பகமான பயணம்.">Comfortable, safe and reliable travel for local trips, outstation journeys, airport transfers, families, groups and customized travel plans.</p>
+      <div class="buttons"><a class="btn btn-primary" href="#booking">🚐 Book Your Ride</a><a class="btn btn-dark" href="https://wa.me/918940366879?text=Hi%20PMS%20Tour%20%26%20Travels,%20I%20want%20to%20book%20a%20ride." target="_blank">💬 WhatsApp</a></div>
+    </div>
+    <div class="hero-card"><img src="assets/pms-hero.png" alt="PMS Tour & Travels vehicle and branding"></div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="container">
+    <div class="section-head"><h2 data-en="Our Travel Services" data-ta="எங்கள் பயண சேவைகள்">Our Travel Services</h2><p data-en="Choose the travel service that fits your journey. Contact PMS for availability and a customized quote." data-ta="உங்கள் பயணத்திற்கு ஏற்ற சேவையை தேர்வு செய்யுங்கள். Availability மற்றும் quote-க்கு PMS-ஐ தொடர்பு கொள்ளுங்கள்.">Choose the travel service that fits your journey. Contact PMS for availability and a customized quote.</p></div>
+    <div class="grid">
+      <article class="card"><div class="icon">✈️</div><h3>Airport Transfers</h3><p>Comfortable pickup and drop for airport journeys.</p></article>
+      <article class="card"><div class="icon">🚗</div><h3>Local Trips</h3><p>Reliable local travel for personal and family needs.</p></article>
+      <article class="card"><div class="icon">🛣️</div><h3>Outstation Trips</h3><p>One-way and round trips for destinations across Tamil Nadu.</p></article>
+      <article class="card"><div class="icon">👨‍👩‍👧</div><h3>Family & Group</h3><p>Comfortable travel for families, friends and groups.</p></article>
+      <article class="card"><div class="icon">🧳</div><h3>Custom Packages</h3><p>Tell us your plan and get a travel package built around it.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="dark" id="about">
+  <div class="container about">
+    <img src="assets/pms-brand-collage.png" alt="PMS Tour & Travels branding and vehicle">
+    <div>
+      <h2>Why PMS?</h2>
+      <p>We are building PMS Tour & Travels as a customer-first travel service with a focus on comfortable rides, clear communication and dependable service.</p>
+      <div class="ticks"><div class="tick">Safe & Reliable</div><div class="tick">Comfortable Rides</div><div class="tick">On-Time Service</div><div class="tick">Family Friendly</div></div>
+      <a class="btn btn-primary" href="#booking">Plan My Trip</a>
+    </div>
+  </div>
+</section>
+
+<section id="booking">
+  <div class="container booking">
+    <div class="booking-info">
+      <h2>Book Your Ride</h2>
+      <p>Fill the form. Your booking request will open directly in WhatsApp so PMS can confirm availability, vehicle and fare.</p>
+      <div class="contact-box">Call / WhatsApp<br><strong>8940366879</strong></div>
+      <div class="contact-box">Service Areas<br><strong style="font-size:17px">All Tamil Nadu • Tourist Destinations • Kerala & Nearby States</strong><br><span style="color:#cfe0fb">Pickup & Drop available as per your preferred location</span></div>
+    </div>
+    <form id="bookingForm">
+      <label>Full Name<input id="name" required placeholder="Your name"></label>
+      <label>Phone Number<input id="phone" required type="tel" placeholder="Your mobile number"></label>
+      <label>Pickup Location<input id="pickup" required placeholder="Pickup point"></label>
+      <label>Drop Location<input id="drop" required placeholder="Destination"></label>
+      <label>Date<input id="date" required type="date"></label>
+      <label>Time<input id="time" required type="time"></label>
+      <label>Service<select id="service"><option>Local Trip</option><option>Outstation Trip</option><option>Airport Transfer</option><option>Family & Group Travel</option><option>Customized Package</option></select></label>
+      <label>Passengers<input id="passengers" type="number" min="1" value="1"></label>
+      <label class="full">Additional Details<textarea id="details" placeholder="Vehicle preference, luggage, return trip, special request..."></textarea></label>
+      <button class="submit" type="submit">Send Booking Request on WhatsApp →</button>
+    </form>
+  </div>
+</section>
+
+<section id="service-areas" class="dark">
+  <div class="container">
+    <div class="section-head">
+      <h2>Service Areas</h2>
+      <p>From local rides to long-distance journeys, PMS can arrange pickup and drop based on your preferred location.</p>
+    </div>
+    <div class="grid">
+      <article class="card"><div class="icon">📍</div><h3>All Tamil Nadu</h3><p>Local and outstation travel across Tamil Nadu.</p></article>
+      <article class="card"><div class="icon">🏞️</div><h3>Tourist Destinations</h3><p>Trips to popular tourist destinations across Tamil Nadu.</p></article>
+      <article class="card"><div class="icon">🌴</div><h3>Kerala & Nearby States</h3><p>Outstation trips to selected destinations beyond Tamil Nadu.</p></article>
+      <article class="card"><div class="icon">🔄</div><h3>One-Way & Round Trip</h3><p>Choose a one-way drop or a return journey.</p></article>
+      <article class="card"><div class="icon">📍</div><h3>Flexible Pickup & Drop</h3><p>Tell us your preferred pickup and destination while booking.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="container">
+    <div class="section-head"><h2>Explore PMS</h2><p>Our current brand creative. More real vehicle and customer-trip photos can be added as the business grows.</p></div>
+    <div class="gallery">
+      <img class="large" src="assets/pms-hero.png" alt="PMS Tour & Travels hero creative">
+      <img class="small" src="assets/pms-brand-collage.png" alt="PMS Tour & Travels promotional collage">
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cta"><div><h2>Ready for your next journey?</h2><p>Safe • Reliable • On Time</p></div><a class="btn btn-primary" href="#booking">Book Your Ride Today</a></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container footer-grid">
+    <div><div class="footer-brand">PMS <span>TOUR & TRAVELS</span></div><p>Your Journey | Our Priority<br>Local • Outstation • Airport • Family & Group Travel</p></div>
+    <div><h4>Quick Links</h4><p><a href="#services">Services</a><br><a href="#about">About PMS</a><br><a href="#booking">Book Now</a><br><a href="#gallery">Gallery</a></p></div>
+    <div><h4>Contact</h4><p>📞 <a href="tel:+918940366879">8940366879</a><br>💬 <a href="https://wa.me/918940366879" target="_blank">WhatsApp</a><br>📍 Tamil Nadu • Tourist Destinations • Kerala & Nearby States</p></div>
+  </div>
+  <div class="container footer-bottom">© <span id="year"></span> PMS Tour & Travels. All rights reserved.</div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('bookingForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const v=id=>document.getElementById(id).value.trim();
+    const msg = `PMS TOUR & TRAVELS - BOOKING REQUEST%0A%0AName: ${v('name')}%0APhone: ${v('phone')}%0APickup: ${v('pickup')}%0ADrop: ${v('drop')}%0ADate: ${v('date')}%0ATime: ${v('time')}%0AService: ${v('service')}%0APassengers: ${v('passengers')}%0ADetails: ${v('details')||'None'}`;
+    window.open(`https://wa.me/918940366879?text=${msg}`, '_blank');
+  });
+  let tamil=false;
+  function toggleLang(){
+    tamil=!tamil;
+    document.querySelectorAll('[data-en]').forEach(el=>el.textContent=tamil?el.dataset.ta:el.dataset.en);
+  }
+</script>
+</body>
+</html>
