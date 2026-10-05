@@ -209,7 +209,7 @@ function formatTime(time) {
       const code = r.booking_code || ('Booking #' + r.id);
       const customer = r.customer_name || 'Customer';
       if (status === 'confirmed') {
-        return `Hello ${customer},\n\nYour PMS Tour & Travels booking request has been CONFIRMED. ✅\n\nBooking ID: ${code}\nTrip: ${r.trip_type || '-'}\nPickup: ${r.pickup_location || '-'}\nDrop: ${r.drop_location || '-'}\nDate: ${r.start_date || '-'}\nTime: ${r.start_time || '-'}\nPassengers: ${r.passengers || '-'}\n\nThank you for choosing PMS Tour & Travels.\nYOUR JOURNEY | OUR PRIORITY`;
+        return `Hello ${customer},\n\nYour PMS Tour & Travels booking request has been CONFIRMED. ✅\n\nBooking ID: ${code}\nTrip: ${r.trip_type || '-'}\nPickup: ${r.pickup_location || '-'}\nDrop: ${r.drop_location || '-'}\nDate: ${r.start_date || '-'}\nTime: ${formatTime(r.start_time) || '-'}\nPassengers: ${r.passengers || '-'}\n\nThank you for choosing PMS Tour & Travels.\nYOUR JOURNEY | OUR PRIORITY`;
       }
       return `Hello ${customer},\n\nYour PMS Tour & Travels booking request has been REJECTED. ❌\n\nBooking ID: ${code}\nTrip: ${r.trip_type || '-'}\nPickup: ${r.pickup_location || '-'}\nDrop: ${r.drop_location || '-'}\nDate: ${r.start_date || '-'}\n\nPlease contact PMS Tour & Travels at 8940366879 if you need any clarification.\nThank you.`;
     }
