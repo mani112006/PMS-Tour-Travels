@@ -24,6 +24,7 @@
       <div class="panel-head">
         <h1>Booking Requests</h1>
         <button id="refreshBtn" class="secondary">↻ Refresh</button>
+        <button id="exportBtn" class="secondary">📥 Export Bookings</button>
       </div>
       <div style="display:flex; gap:10px; margin:15px 0; flex-wrap:wrap;">
   <input
@@ -70,7 +71,8 @@
     const msg = document.getElementById('dashMessage');
     const bookingSearch = document.getElementById('bookingSearch');
 const bookingFilter = document.getElementById('bookingFilter');
-const bookingDateFilter = document.getElementById('bookingDateFilter');    
+const bookingDateFilter = document.getElementById('bookingDateFilter');  
+const exportBtn = document.getElementById('exportBtn');    
 
 let allBookings = [];
     const reviewList = document.getElementById('reviews');
@@ -356,7 +358,72 @@ return matchesSearch && matchesStatus && matchesDate;
 
   showMsg('');
 }
+function exportBookings() {
+  if (!allBookings.length) {
+    showMsg('No bookings available to export.', true);
+    return;
+  }
 
+  const headers = [
+    'Booking ID',
+    'Customer Name',
+    'Phone',
+    'Trip Type',
+    'Days',
+    'Pickup',
+    'Drop',
+    'Date',
+    'Time',
+    'Passengers',
+    'Service',
+    'Destinations',
+    'Additional Details',
+    'Status'
+  ];
+
+  const rows = allBookings.map(r => [
+    r.booking_code || '',
+    r.customer_name || '',
+    r.phone || '',
+    r.trip_type || '',
+    r.number_of_days ?? '',
+    r.pickup_location || '',
+    r.drop_location || '',
+    r.start_date || '',
+    formatTime(r.start_time),
+    r.passengers ?? '',
+    r.service_type || '',
+    r.destinations || '',
+    r.additional_details || '',
+    r.status || 'pending'
+  ]);
+
+  const csv = [headers, ...rows]
+    .map(row =>
+      row.map(value =>
+        `"${String(value).replace(/"/g, '""')}"`
+      ).join(',')
+    )
+    .join('\n');
+
+  const blob = new Blob([csv], {
+    type: 'text/csv;charset=utf-8;'
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = `PMS-Bookings-${new Date().toISOString().slice(0, 10)}.csv`;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  showMsg('Bookings exported successfully.');
+}
+    
 // Search typing
 bookingSearch.addEventListener('input', renderBookings);
 
@@ -364,7 +431,8 @@ bookingSearch.addEventListener('input', renderBookings);
 bookingFilter.addEventListener('change', renderBookings);
 
 // Date filter
-bookingDateFilter.addEventListener('change', renderBookings);    
+bookingDateFilter.addEventListener('change', renderBookings);
+exportBtn.addEventListener('click', exportBookings);    
 
    async function updateStatus(id, status) {
   const label = status === 'confirmed' ? 'Confirm' : 'Reject';
