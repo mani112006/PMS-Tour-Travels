@@ -17,6 +17,20 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Telegram configuration missing" });
     }
 
+    function formatTime(time) {
+      if (!time) return "-";
+
+      const [h, m = "00"] = String(time).split(":");
+      const hour = Number(h);
+
+      if (!Number.isFinite(hour)) return String(time);
+
+      const suffix = hour >= 12 ? "PM" : "AM";
+      const hour12 = hour % 12 || 12;
+
+      return `${hour12}:${m} ${suffix}`;
+    }
+
     const message = `
 🚕 NEW PMS TOUR & TRAVELS BOOKING
 
@@ -25,13 +39,16 @@ export default async function handler(req, res) {
 📞 Phone: ${booking.phone || "-"}
 🚗 Trip Type: ${booking.trip_type || "-"}
 📅 Date: ${booking.start_date || "-"}
-⏰ Time: ${booking.start_time || "-"}
+⏰ Time: ${formatTime(booking.start_time)}
 👥 Passengers: ${booking.passengers || "-"}
 📍 Pickup: ${booking.pickup_location || "-"}
 📍 Drop: ${booking.drop_location || "-"}
 🛣️ Service: ${booking.service_type || "-"}
 🌍 Destinations: ${booking.destinations || "-"}
 📝 Details: ${booking.additional_details || "-"}
+
+🔐 Open Owner Login:
+https://pms-tour-travels.vercel.app/login.html
 `;
 
     const response = await fetch(
@@ -43,7 +60,8 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           chat_id: chatId,
-          text: message
+          text: message,
+          disable_web_page_preview: true
         })
       }
     );
