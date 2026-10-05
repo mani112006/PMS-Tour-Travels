@@ -28,6 +28,15 @@
       <p id="dashMessage" class="message"></p>
       <div id="bookings" class="booking-list"></div>
     </section>
+    <section class="panel">
+  <div class="panel-head">
+    <h1>Customer Reviews</h1>
+    <button id="refreshReviewsBtn" class="secondary">↻ Refresh Reviews</button>
+  </div>
+
+  <p id="reviewDashMessage" class="message"></p>
+  <div id="reviews" class="booking-list"></div>
+</section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -38,6 +47,98 @@
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     const list = document.getElementById('bookings');
     const msg = document.getElementById('dashMessage');
+    const reviewList = document.getElementById('reviews');
+const reviewMsg = document.getElementById('reviewDashMessage');
+
+async function loadReviews() {
+  reviewMsg.textContent = 'Loading reviews...';
+
+  const { data, error } = await supabaseClient
+    .from('reviews')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    reviewMsg.textContent = error.message;
+    return;
+  }
+
+  const rows = data || [];
+
+  if (!rows.length) {
+    reviewList.innerHTML = '<div class="empty">No customer reviews yet.</div>';
+    reviewMsg.textContent = '';
+    return;
+  }
+
+  reviewList.innerHTML = rows.map(r => `
+    <article class="booking-card">
+      <div class="booking-head">
+        <div>
+          <strong>${esc(r.customer_name)}</strong>
+          <div class="small">
+            ${esc(r.created_at ? new Date(r.created_at).toLocaleString('en-IN') : '')}
+          </div>
+        </div>
+        <span class="badge ${statusClass(r.status)}">
+          ${esc(r.status || 'pending')}
+        </span>
+      </div>
+
+      <div class="grid">
+        <div>
+          <b>Rating</b>
+          <span>${'⭐'.repeat(Number(r.rating) || 0)}</span>
+        </div>
+
+        <div class="wide">
+          <b>Review</b>
+          <span>${esc(r.review_message)}</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        ${
+          r.status === 'pending'
+          ? `
+            <button class="confirm review-status"
+              data-review-id="${r.id}"
+              data-review-status="approved">
+              ✓ Approve
+            </button>
+
+            <button class="reject review-status"
+              data-review-id="${r.id}"
+              data-review-status="rejected">
+              ✕ Reject
+            </button>
+          `
+          : ''
+        }
+      </div>
+    </article>
+  `).join('');
+
+  reviewMsg.textContent = '';
+}
+
+async function updateReviewStatus(id, status) {
+  const label = status === 'approved' ? 'Approve' : 'Reject';
+
+  if (!confirm(`${label} this review?`)) return;
+
+  const { error } = await supabaseClient
+    .from('reviews')
+    .update({ status })
+    .eq('id', id);
+
+  if (error) {
+    reviewMsg.textContent = error.message;
+    return;
+  }
+
+  await loadReviews();
+}
 
     function esc(value) {
       return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -193,6 +294,19 @@ function formatTime(time) {
       if (b) updateStatus(b.dataset.id, b.dataset.status);
     });
 
+    document.getElementById('reviews').addEventListener('click', e => {
+  const button = e.target.closest('.review-status');
+
+  if (!button) return;
+
+  updateReviewStatus(
+    button.dataset.reviewId,
+    button.dataset.reviewStatus
+  );
+});
+
+document.getElementById('refreshReviewsBtn')
+  .addEventListener('click', loadReviews);
     document.getElementById('refreshBtn').addEventListener('click', loadBookings);
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
@@ -200,7 +314,10 @@ function formatTime(time) {
     });
 
     (async () => {
-      if (await guard()) await loadBookings();
+      if (await guard()) {
+  await loadBookings();
+  await loadReviews();
+}
     })();
   </script>
 </body>
