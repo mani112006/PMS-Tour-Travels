@@ -4,29 +4,9 @@
       <h2>What Our Customers Say</h2>
       <p>Our customers' trust and satisfaction are our priority.</p>
     </div>
-
-    <div class="grid">
-      <div class="card">
-        <div class="icon">⭐⭐⭐⭐</div>
-        <h3>Excellent Service</h3>
-        <p>“Very comfortable journey and friendly service. Highly recommended!”</p>
-        <strong>— PMS Customer</strong>
-      </div>
-
-      <div class="card">
-        <div class="icon">⭐⭐⭐</div>
-        <h3>Safe & Reliable</h3>
-        <p>“On-time pickup and a smooth travel experience. Good service.”</p>
-        <strong>— PMS Customer</strong>
-      </div>
-
-      <div class="card">
-        <div class="icon">⭐⭐⭐⭐</div>
-        <h3>Great Travel Experience</h3>
-        <p>“Good vehicle, good support and a comfortable trip.”</p>
-        <strong>— PMS Customer</strong>
-      </div>
-    </div>
+   <div id="approvedReviews" class="grid">
+  <p>Loading customer reviews...</p>
+</div>
   </div>
 </section><section>
   <div class="container">
@@ -90,6 +70,38 @@ const supabaseClient = supabase.createClient(
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
+const approvedReviews = document.getElementById('approvedReviews');
+
+async function loadApprovedReviews() {
+  const { data, error } = await supabaseClient
+    .from('reviews')
+    .select('customer_name, rating, review_message, created_at')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Review loading error:', error);
+    approvedReviews.innerHTML = '<p>Unable to load reviews.</p>';
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    approvedReviews.innerHTML =
+      '<p>No customer reviews yet. Be the first to share your experience!</p>';
+    return;
+  }
+
+  approvedReviews.innerHTML = data.map(review => `
+    <div class="card">
+      <div class="icon">${'⭐'.repeat(Number(review.rating) || 0)}</div>
+      <h3>${review.customer_name}</h3>
+      <p>“${review.review_message}”</p>
+      <strong>— PMS Customer</strong>
+    </div>
+  `).join('');
+}
+
+loadApprovedReviews();  
 const reviewForm = document.getElementById('reviewForm');
 const reviewMessageStatus = document.getElementById('reviewMessageStatus');
 
