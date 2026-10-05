@@ -32,7 +32,7 @@ Additional Details: ${booking.additional_details || "-"}
       },
       body: JSON.stringify({
         from: "PMS Tour & Travels <onboarding@resend.dev>",
-        to: ["pms.travels.tour@gmail.com"],
+        to: ["selvamani0089@gmail.com"],
         subject: `New Booking - ${booking.booking_code || "PMS"}`,
         text: emailText
       })
