@@ -21,6 +21,17 @@
       <div class="stat rejected"><span>Rejected</span><strong id="rejectedCount">0</strong></div>
     </section>
 
+
+    <section id="cancellationAlert" class="panel" style="margin-top:16px; cursor:pointer;" onclick="location.href='cancellations.html'">
+      <div class="panel-head">
+        <h2 style="margin:0;">🔔 Cancellation Requests</h2>
+        <span id="cancellationAlertBadge" class="badge pending">Checking...</span>
+      </div>
+      <p id="cancellationAlertText" style="margin:8px 0 0;">
+        Checking for new cancellation requests...
+      </p>
+    </section>
+
     <section class="panel">
       <div class="panel-head">
         <h1>Booking Requests</h1>
@@ -617,6 +628,8 @@ document.getElementById('refreshReviewsBtn')
 
     const cancellationList = document.getElementById('cancellationRequests');
     const cancellationMsg = document.getElementById('cancellationDashMessage');
+    const cancellationAlertBadge = document.getElementById('cancellationAlertBadge');
+    const cancellationAlertText = document.getElementById('cancellationAlertText');
 
     async function loadCancellationRequests() {
       cancellationMsg.textContent = 'Loading cancellation requests...';
@@ -633,6 +646,24 @@ document.getElementById('refreshReviewsBtn')
       }
 
       const rows = data || [];
+      const pendingCount = rows.filter(r =>
+        String(r.status || 'pending').toLowerCase() === 'pending'
+      ).length;
+
+      if (pendingCount > 0) {
+        cancellationAlertBadge.textContent =
+          `${pendingCount} New Request${pendingCount === 1 ? '' : 's'}`;
+        cancellationAlertBadge.style.background = '#fee2e2';
+        cancellationAlertBadge.style.color = '#991b1b';
+        cancellationAlertText.textContent =
+          '🔴 New cancellation request received. Click here to review.';
+      } else {
+        cancellationAlertBadge.textContent = 'No New Requests';
+        cancellationAlertBadge.style.background = '#dcfce7';
+        cancellationAlertBadge.style.color = '#166534';
+        cancellationAlertText.textContent =
+          'No pending cancellation requests right now. Click here to open the cancellation page.';
+      }
 
       if (!rows.length) {
         cancellationList.innerHTML =
