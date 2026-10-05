@@ -94,6 +94,31 @@
 </form>
 </div>
 </section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <h2>Check Your Booking Status</h2>
+      <p>Enter your Booking ID to check the latest status of your request.</p>
+    </div>
+
+    <div class="card" style="max-width:700px;margin:auto;">
+      <label>
+        Booking ID
+        <input id="statusBookingId" type="text"
+          placeholder="Example: PMS-20261005-ABC123"
+          style="text-transform:uppercase;">
+      </label>
+
+      <button class="submit" id="checkStatusBtn" type="button">
+        🔎 Check Booking Status
+      </button>
+
+      <div id="statusResult" style="margin-top:18px;"></div>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <footer><div class="container footer-grid">
@@ -262,6 +287,100 @@
       submitBtn.textContent = 'Send Book Request →';
     }
   });
+  const statusBookingId = document.getElementById('statusBookingId');
+  const checkStatusBtn = document.getElementById('checkStatusBtn');
+  const statusResult = document.getElementById('statusResult');
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[ch]));
+  }
+
+  function statusBadge(status) {
+    const s = String(status || 'pending').toLowerCase();
+
+    if (s === 'confirmed') {
+      return '<span style="display:inline-block;padding:7px 14px;border-radius:999px;background:#dcfce7;color:#166534;font-weight:800;">🟢 Confirmed</span>';
+    }
+
+    if (s === 'rejected') {
+      return '<span style="display:inline-block;padding:7px 14px;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:800;">🔴 Rejected</span>';
+    }
+
+    return '<span style="display:inline-block;padding:7px 14px;border-radius:999px;background:#fef3c7;color:#92400e;font-weight:800;">🟡 Pending</span>';
+  }
+
+  checkStatusBtn.addEventListener('click', async () => {
+    const bookingId = statusBookingId.value.trim().toUpperCase();
+
+    statusResult.innerHTML = '';
+
+    if (!bookingId) {
+      statusResult.innerHTML =
+        '<p style="color:#b42318;font-weight:700;">Please enter your Booking ID.</p>';
+      statusBookingId.focus();
+      return;
+    }
+
+    if (!supabaseClient) {
+      statusResult.innerHTML =
+        '<p style="color:#b42318;font-weight:700;">Booking system is not connected. Please refresh and try again.</p>';
+      return;
+    }
+
+    checkStatusBtn.disabled = true;
+    checkStatusBtn.textContent = 'Checking...';
+
+    try {
+      const { data, error } = await supabaseClient
+        .from('Booking')
+        .select('booking_code, customer_name, phone, trip_type, number_of_days, pickup_location, drop_location, start_date, start_time, passengers, service_type, destinations, status')
+        .eq('booking_code', bookingId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        statusResult.innerHTML =
+          '<div class="card" style="margin-top:10px;"><p style="color:#b42318;font-weight:800;">Booking ID not found.</p><p>Please check the Booking ID and try again.</p></div>';
+        return;
+      }
+
+      statusResult.innerHTML = `
+        <div class="card" style="margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+            <h3 style="margin:0;">Booking ${escapeHtml(data.booking_code)}</h3>
+            ${statusBadge(data.status)}
+          </div>
+
+          <div style="margin-top:18px;display:grid;gap:10px;">
+            <p><strong>Customer:</strong> ${escapeHtml(data.customer_name)}</p>
+            <p><strong>Trip Type:</strong> ${escapeHtml(data.trip_type)}</p>
+            <p><strong>Date:</strong> ${escapeHtml(data.start_date)}</p>
+            <p><strong>Time:</strong> ${escapeHtml(data.start_time)}</p>
+            <p><strong>Passengers:</strong> ${escapeHtml(data.passengers)}</p>
+            <p><strong>Service:</strong> ${escapeHtml(data.service_type)}</p>
+            <p><strong>Pickup:</strong> ${escapeHtml(data.pickup_location)}</p>
+            <p><strong>Drop:</strong> ${escapeHtml(data.drop_location)}</p>
+            <p><strong>Destinations:</strong> ${escapeHtml(data.destinations || 'Not specified')}</p>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Booking status error:', error);
+      statusResult.innerHTML =
+        '<p style="color:#b42318;font-weight:700;">Unable to check booking status. Please try again.</p>';
+    } finally {
+      checkStatusBtn.disabled = false;
+      checkStatusBtn.textContent = '🔎 Check Booking Status';
+    }
+  });
+
 })();
 </script>
 </body>
