@@ -274,10 +274,35 @@
 } catch (emailError) {
   console.error('Email notification error:', emailError);
 }
-      showMessage('', '#087443');
-      message.innerHTML = `Booking request submitted successfully!<br>Booking ID: <strong>${bookingCode}</strong><br>Status: <strong>Pending</strong>`;
+      message.innerHTML = `
+        <div class="card" style="margin-top:10px;border:2px solid #087443;">
+          <div style="font-size:42px;text-align:center;">✅</div>
+          <h2 style="text-align:center;margin:8px 0;color:#087443;">Booking Request Submitted!</h2>
+          <p style="text-align:center;margin:8px 0;">Thank you for choosing <strong>PMS Tour & Travels</strong>.</p>
+          <div style="text-align:center;margin:18px 0;">
+            <div style="font-size:14px;font-weight:700;">YOUR BOOKING ID</div>
+            <div style="font-size:24px;font-weight:900;letter-spacing:1px;margin-top:5px;">${bookingCode}</div>
+          </div>
+          <p style="text-align:center;"><strong>🟡 Status: Pending</strong></p>
+          <p style="text-align:center;font-size:14px;">Please save your Booking ID. You can use it below to check your booking status anytime.</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+            <button type="button" class="secondary" id="confirmationCheckStatus">🔎 Check Booking Status</button>
+            <a class="call" href="tel:+918940366879">📞 Call PMS</a>
+            <a class="wa" href="https://wa.me/918940366879" target="_blank" rel="noopener">💬 WhatsApp PMS</a>
+          </div>
+        </div>
+      `;
       form.reset();
       document.getElementById('passengers').value = 1;
+
+      document.getElementById('confirmationCheckStatus')?.addEventListener('click', () => {
+        const statusInput = document.getElementById('statusBookingId');
+        if (statusInput) {
+          statusInput.value = bookingCode;
+          statusInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          statusInput.focus();
+        }
+      });
     } catch (error) {
       console.error('Supabase booking error:', error);
       const detail = error && error.message ? error.message : 'Please try again or call 8940366879.';
