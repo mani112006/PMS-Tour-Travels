@@ -219,7 +219,7 @@
         .insert(payload);
 
       if (error) throw error;
-      await fetch('/api/send-booking-email', {
+      await fetch('https://script.google.com/macros/s/AKfycbyrmfDjdPpZmymDW190ZK1t_Lwdy3QVHJ1a3rg2qVMy7sTVUf7VZ_8JZWVASCpJT-fh/exec', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(payload)
