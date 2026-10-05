@@ -7,29 +7,122 @@
 
     <div class="grid">
       <div class="card">
-        <div class="icon">⭐</div>
+        <div class="icon">⭐⭐⭐⭐</div>
         <h3>Excellent Service</h3>
         <p>“Very comfortable journey and friendly service. Highly recommended!”</p>
         <strong>— PMS Customer</strong>
       </div>
 
       <div class="card">
-        <div class="icon">⭐</div>
+        <div class="icon">⭐⭐⭐</div>
         <h3>Safe & Reliable</h3>
         <p>“On-time pickup and a smooth travel experience. Good service.”</p>
         <strong>— PMS Customer</strong>
       </div>
 
       <div class="card">
-        <div class="icon">⭐</div>
+        <div class="icon">⭐⭐⭐⭐</div>
         <h3>Great Travel Experience</h3>
         <p>“Good vehicle, good support and a comfortable trip.”</p>
         <strong>— PMS Customer</strong>
       </div>
     </div>
   </div>
+</section><section>
+  <div class="container">
+    <div class="section-head">
+      <h2>Share Your Experience</h2>
+      <p>Have you travelled with PMS Tour & Travels? We would love to hear from you.</p>
+    </div>
+
+    <div class="card">
+      <form id="reviewForm">
+        <label for="reviewName"><strong>Your Name</strong></label>
+        <input
+          type="text"
+          id="reviewName"
+          name="reviewName"
+          placeholder="Enter your name"
+          required
+        >
+
+        <label for="reviewRating"><strong>Your Rating</strong></label>
+        <select id="reviewRating" name="reviewRating" required>
+          <option value="">Select rating</option>
+          <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+          <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+          <option value="3">⭐⭐⭐ 3 - Good</option>
+          <option value="2">⭐⭐ 2 - Average</option>
+          <option value="1">⭐ 1 - Needs Improvement</option>
+        </select>
+
+        <label for="reviewMessage"><strong>Your Review</strong></label>
+        <textarea
+          id="reviewMessage"
+          name="reviewMessage"
+          rows="5"
+          placeholder="Write your travel experience..."
+          required
+        ></textarea>
+
+        <button type="submit" class="btn btn-primary">
+          ⭐ Submit Review
+        </button>
+
+        <p id="reviewMessageStatus"></p>
+      </form>
+    </div>
+  </div>
 </section><section><div class="container"><div class="cta"><div><h2>Ready for your next journey?</h2><p>Safe • Reliable • On Time</p></div><a class="btn btn-primary" href="booking.html">Book Your Ride Today</a></div></div></section></main><footer><div class="container footer-grid"><div><div class="footer-brand">PMS <span>TOUR & TRAVELS</span></div><p>Your Journey | Our Priority<br>Local • Outstation • Airport • Family & Group Travel</p></div><div><h4>Quick Links</h4><p><a href="index.html">Home</a><br><a href="services.html">Services</a><br><a href="about.html">About PMS</a><br><a href="areas.html">Service Areas</a><br><a href="gallery.html">Gallery</a><br><a href="booking.html">Book Now</a></p></div><div><h4>Contact</h4><p>📞 <a href="tel:+918940366879">8940366879</a><br>💬 <a href="https://wa.me/918940366879" target="_blank">WhatsApp</a><br>📍 Tamil Nadu • Tourist Destinations • Kerala & Nearby States</p></div></div><div class="container footer-bottom">
   © <span id="year"></span> PMS Tour & Travels. All rights reserved.
   <br>
   <span>Website Designed & Developed by <strong>Manikandan S.</strong></span>
-</div></footer><script>document.getElementById('year').textContent=new Date().getFullYear();</script></body></html>
+</div></footer><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://vepmonwrunlxeufdhpto.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_fgPL2d8_fCfSZsVgL-UVvg_NbRmOJxa";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const reviewForm = document.getElementById('reviewForm');
+const reviewMessageStatus = document.getElementById('reviewMessageStatus');
+
+reviewForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const customerName = document.getElementById('reviewName').value.trim();
+  const rating = Number(document.getElementById('reviewRating').value);
+  const reviewMessage = document.getElementById('reviewMessage').value.trim();
+
+  reviewMessageStatus.textContent = "Submitting review...";
+
+  const { error } = await supabaseClient
+    .from('reviews')
+    .insert([
+      {
+        customer_name: customerName,
+        rating: rating,
+        review_message: reviewMessage,
+        status: 'pending'
+      }
+    ]);
+
+  if (error) {
+    console.error(error);
+    reviewMessageStatus.textContent =
+      "Unable to submit review. Please try again.";
+    return;
+  }
+
+  reviewMessageStatus.textContent =
+    "Thank you! Your review has been submitted for approval.";
+
+  reviewForm.reset();
+});
+</script></body></html>
