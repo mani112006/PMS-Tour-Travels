@@ -19,6 +19,7 @@
       <div class="stat pending"><span>Pending</span><strong id="pendingCount">0</strong></div>
       <div class="stat confirmed"><span>Confirmed</span><strong id="confirmedCount">0</strong></div>
       <div class="stat rejected"><span>Rejected</span><strong id="rejectedCount">0</strong></div>
+      <div class="stat" style="border-left:4px solid #dc2626;"><span>Cancelled</span><strong id="cancelledCount">0</strong></div>
     </section>
 
 
@@ -51,6 +52,7 @@
     <option value="pending">Pending</option>
     <option value="confirmed">Confirmed</option>
     <option value="rejected">Rejected</option>
+    <option value="cancelled">Cancelled</option>
   </select>
         <select id="bookingDateFilter">
   <option value="all">All Dates</option>
@@ -281,6 +283,8 @@ function formatTime(time) {
     allBookings.filter(r => r.status === 'confirmed').length;
   document.getElementById('rejectedCount').textContent =
     allBookings.filter(r => r.status === 'rejected').length;
+  document.getElementById('cancelledCount').textContent =
+    allBookings.filter(r => r.status === 'cancelled').length;
 
   renderBookings();
 }
