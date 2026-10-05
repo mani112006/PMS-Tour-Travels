@@ -8,6 +8,12 @@
 <link rel="icon" href="assets/pms-logo.png">
 <title>PMS Tour & Travels | Book Your Ride</title>
 <meta name="description" content="PMS Tour & Travels — Your Journey | Our Priority">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  emailjs.init({
+    publicKey: "RvHZuHcuZSzFTwdmn"
+  });
+</script>
 </head>
 <body>
 <header><nav class="container">
@@ -220,16 +226,28 @@
 
       if (error) throw error;
      try {
-  await fetch('https://script.google.com/macros/s/AKfycbyrmfDjdPpZmymDW190ZK1t_Lwdy3QVHJ1a3rg2qVMy7sTVUf7VZ_8JZWVASCpJT-fh/exec', {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
-  });
+  await emailjs.send(
+    'service_qaq8a8o',
+    'template_lvr19pk',
+    {
+      booking_code: payload.booking_code,
+      customer_name: payload.customer_name,
+      phone: payload.phone,
+      trip_type: payload.trip_type,
+      number_of_days: payload.number_of_days,
+      pickup_location: payload.pickup_location,
+      drop_location: payload.drop_location,
+      start_date: payload.start_date,
+      start_time: payload.start_time,
+      passengers: payload.passengers,
+      service_type: payload.service_type,
+      destinations: payload.destinations,
+      additional_details: payload.additional_details
+    }
+  );
 } catch (emailError) {
   console.error('Email notification error:', emailError);
 }
-
       showMessage('', '#087443');
       message.innerHTML = `Booking request submitted successfully!<br>Booking ID: <strong>${bookingCode}</strong><br>Status: <strong>Pending</strong>`;
       form.reset();
