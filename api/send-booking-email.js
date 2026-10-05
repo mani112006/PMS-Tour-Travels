@@ -40,17 +40,28 @@ Additional Details: ${booking.additional_details || "-"}
 
     const data = await response.json();
 
+    console.log("RESEND STATUS:", response.status);
+    console.log("RESEND RESPONSE:", data);
+
     if (!response.ok) {
-      return res.status(response.status).json(data);
+      return res.status(response.status).json({
+        success: false,
+        resend_status: response.status,
+        resend_error: data
+      });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Booking email sent successfully"
+      message: "Booking email sent successfully",
+      resend: data
     });
 
   } catch (error) {
+    console.error("EMAIL ERROR:", error);
+
     return res.status(500).json({
+      success: false,
       error: error.message
     });
   }
