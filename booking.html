@@ -119,6 +119,44 @@
   </div>
 </section>
 
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <h2>Request Booking Cancellation</h2>
+      <p>Enter your Booking ID and registered phone number to request cancellation.</p>
+    </div>
+
+    <div class="card" style="max-width:700px;margin:auto;">
+      <label>
+        Booking ID
+        <input id="cancelBookingId" type="text"
+          placeholder="Example: PMS-20261005-ABC123"
+          style="text-transform:uppercase;">
+      </label>
+
+      <label>
+        Registered Phone / WhatsApp
+        <input id="cancelPhone" type="tel"
+          placeholder="Enter the phone number used for booking"
+          inputmode="tel">
+      </label>
+
+      <label>
+        Cancellation Reason
+        <textarea id="cancelReason" rows="4"
+          placeholder="Tell us why you want to cancel the booking..."></textarea>
+      </label>
+
+      <button class="submit" id="cancelRequestBtn" type="button">
+        ❌ Request Cancellation
+      </button>
+
+      <p id="cancelMessage" style="margin:14px 0 0;font-weight:800;text-align:center;"></p>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <footer><div class="container footer-grid">
@@ -403,6 +441,106 @@
     } finally {
       checkStatusBtn.disabled = false;
       checkStatusBtn.textContent = '🔎 Check Booking Status';
+    }
+  });
+
+  const cancelBookingId = document.getElementById('cancelBookingId');
+  const cancelPhone = document.getElementById('cancelPhone');
+  const cancelReason = document.getElementById('cancelReason');
+  const cancelRequestBtn = document.getElementById('cancelRequestBtn');
+  const cancelMessage = document.getElementById('cancelMessage');
+
+  cancelRequestBtn.addEventListener('click', async () => {
+    const bookingId = cancelBookingId.value.trim().toUpperCase();
+    const phone = cancelPhone.value.trim();
+    const reason = cancelReason.value.trim();
+
+    cancelMessage.textContent = '';
+    cancelMessage.style.color = '';
+
+    if (!bookingId || !phone || !reason) {
+      cancelMessage.textContent =
+        'Please fill Booking ID, registered phone number and cancellation reason.';
+      cancelMessage.style.color = '#b42318';
+      return;
+    }
+
+    if (!supabaseClient) {
+      cancelMessage.textContent =
+        'Booking system is not connected. Please refresh and try again.';
+      cancelMessage.style.color = '#b42318';
+      return;
+    }
+
+    cancelRequestBtn.disabled = true;
+    cancelRequestBtn.textContent = 'Submitting...';
+
+    try {
+      const { data: booking, error: bookingError } = await supabaseClient
+        .from('Booking')
+        .select('booking_code, customer_name, phone, status')
+        .eq('booking_code', bookingId)
+        .eq('phone', phone)
+        .maybeSingle();
+
+      if (bookingError) throw bookingError;
+
+      if (!booking) {
+        cancelMessage.textContent =
+          'Booking ID or registered phone number is incorrect.';
+        cancelMessage.style.color = '#b42318';
+        return;
+      }
+
+      if (String(booking.status || '').toLowerCase() !== 'confirmed') {
+        cancelMessage.textContent =
+          'Only confirmed bookings can be cancelled.';
+        cancelMessage.style.color = '#b42318';
+        return;
+      }
+
+      const { data: existingRequest, error: existingError } =
+        await supabaseClient
+          .from('cancellation_requests')
+          .select('id, status')
+          .eq('booking_code', booking.booking_code)
+          .in('status', ['pending', 'approved'])
+          .maybeSingle();
+
+      if (existingError) throw existingError;
+
+      if (existingRequest) {
+        cancelMessage.textContent =
+          'A cancellation request already exists for this booking.';
+        cancelMessage.style.color = '#92400e';
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('cancellation_requests')
+        .insert({
+          booking_code: booking.booking_code,
+          customer_name: booking.customer_name,
+          phone: booking.phone,
+          reason: reason,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      cancelMessage.textContent =
+        'Cancellation request submitted successfully. PMS will review your request.';
+      cancelMessage.style.color = '#087443';
+
+      cancelReason.value = '';
+    } catch (error) {
+      console.error('Cancellation request error:', error);
+      cancelMessage.textContent =
+        'Unable to submit cancellation request. Please try again or call 8940366879.';
+      cancelMessage.style.color = '#b42318';
+    } finally {
+      cancelRequestBtn.disabled = false;
+      cancelRequestBtn.textContent = '❌ Request Cancellation';
     }
   });
 
