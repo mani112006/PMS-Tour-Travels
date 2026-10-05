@@ -288,6 +288,23 @@
         .insert(payload);
 
       if (error) throw error;
+
+      // Telegram owner notification
+      // The bot token and chat ID stay securely on Vercel.
+      try {
+        await fetch('/api/telegram-notify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            booking: payload
+          })
+        });
+      } catch (telegramError) {
+        console.error('Telegram notification error:', telegramError);
+      }
+
      try {
   console.log("EMAILJS STARTING", payload);
   await emailjs.send(
