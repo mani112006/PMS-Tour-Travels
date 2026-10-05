@@ -39,6 +39,12 @@
     <option value="confirmed">Confirmed</option>
     <option value="rejected">Rejected</option>
   </select>
+        <select id="bookingDateFilter">
+  <option value="all">All Dates</option>
+  <option value="today">Today</option>
+  <option value="tomorrow">Tomorrow</option>
+  <option value="week">This Week</option>
+</select>
 </div>
       <p id="dashMessage" class="message"></p>
       <div id="bookings" class="booking-list"></div>
@@ -64,6 +70,7 @@
     const msg = document.getElementById('dashMessage');
     const bookingSearch = document.getElementById('bookingSearch');
 const bookingFilter = document.getElementById('bookingFilter');
+const bookingDateFilter = document.getElementById('bookingDateFilter');    
 
 let allBookings = [];
     const reviewList = document.getElementById('reviews');
@@ -246,6 +253,7 @@ function formatTime(time) {
 function renderBookings() {
   const searchText = (bookingSearch.value || '').trim().toLowerCase();
   const filterStatus = bookingFilter.value;
+  const filterDate = bookingDateFilter.value;
 
   const filteredRows = allBookings.filter(r => {
     const matchesSearch =
@@ -254,11 +262,38 @@ function renderBookings() {
       String(r.phone || '').toLowerCase().includes(searchText) ||
       String(r.booking_code || '').toLowerCase().includes(searchText);
 
-    const matchesStatus =
-      filterStatus === 'all' ||
-      String(r.status || 'pending').toLowerCase() === filterStatus;
+   const matchesStatus =
+  filterStatus === 'all' ||
+  String(r.status || 'pending').toLowerCase() === filterStatus;
 
-    return matchesSearch && matchesStatus;
+const matchesDate = (() => {
+  if (filterDate === 'all') return true;
+  if (!r.start_date) return false;
+
+  const bookingDate = new Date(r.start_date + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (filterDate === 'today') {
+    return bookingDate.getTime() === today.getTime();
+  }
+
+  if (filterDate === 'tomorrow') {
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    return bookingDate.getTime() === tomorrow.getTime();
+  }
+
+  if (filterDate === 'week') {
+    const weekEnd = new Date(today);
+    weekEnd.setDate(today.getDate() + 7);
+    return bookingDate >= today && bookingDate < weekEnd;
+  }
+
+  return true;
+})();
+
+return matchesSearch && matchesStatus && matchesDate;
   });
 
   if (!filteredRows.length) {
@@ -327,6 +362,9 @@ bookingSearch.addEventListener('input', renderBookings);
 
 // Status filter
 bookingFilter.addEventListener('change', renderBookings);
+
+// Date filter
+bookingDateFilter.addEventListener('change', renderBookings);    
 
    async function updateStatus(id, status) {
   const label = status === 'confirmed' ? 'Confirm' : 'Reject';
