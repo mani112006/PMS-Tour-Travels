@@ -290,7 +290,6 @@
       if (error) throw error;
 
       // Telegram owner notification
-      // The bot token and chat ID stay securely on Vercel.
       try {
         await fetch('/api/telegram-notify', {
           method: 'POST',
