@@ -62,6 +62,14 @@
 </section>
   </main>
 
+    <div id="bookingDetailsModal" class="booking-details-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999; padding:20px; overflow:auto;">
+      <div style="max-width:700px; margin:40px auto; background:#fff; border-radius:16px; padding:24px; position:relative;">
+        <button id="closeBookingDetails" type="button" style="position:absolute; right:16px; top:12px; border:0; background:transparent; font-size:28px; cursor:pointer;">&times;</button>
+        <h2 style="margin-top:0;">Booking Details</h2>
+        <div id="bookingDetailsContent"></div>
+      </div>
+    </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../supabase-config.js"></script>
   <script>
@@ -73,7 +81,10 @@
     const bookingSearch = document.getElementById('bookingSearch');
 const bookingFilter = document.getElementById('bookingFilter');
 const bookingDateFilter = document.getElementById('bookingDateFilter');  
-const exportBtn = document.getElementById('exportBtn');    
+const exportBtn = document.getElementById('exportBtn');
+    const bookingDetailsModal = document.getElementById('bookingDetailsModal');
+    const bookingDetailsContent = document.getElementById('bookingDetailsContent');
+    const closeBookingDetails = document.getElementById('closeBookingDetails');
 
 let allBookings = [];
     const reviewList = document.getElementById('reviews');
@@ -343,6 +354,7 @@ return matchesSearch && matchesStatus && matchesDate;
         </div>
 
         <div class="actions">
+          <button class="secondary view-details" data-id="${r.id}">👁️ View Details</button>
           <a class="call" href="tel:${encodeURIComponent(r.phone || '')}">📞 Call</a>
           ${waAction}
 
@@ -359,6 +371,63 @@ return matchesSearch && matchesStatus && matchesDate;
 
   showMsg('');
 }
+function openBookingDetails(id) {
+  const booking = allBookings.find(r => String(r.id) === String(id));
+  if (!booking) {
+    showMsg('Booking details could not be found.', true);
+    return;
+  }
+
+  const status = String(booking.status || 'pending');
+
+  bookingDetailsContent.innerHTML = `
+    <div class="grid">
+      <div><b>Booking ID</b><span>${esc(booking.booking_code || ('Booking #' + booking.id))}</span></div>
+      <div><b>Status</b><span>${esc(status)}</span></div>
+      <div><b>Customer Name</b><span>${esc(booking.customer_name)}</span></div>
+      <div><b>Phone</b><span>${esc(booking.phone)}</span></div>
+      <div><b>Trip Type</b><span>${esc(booking.trip_type)}</span></div>
+      <div><b>Days</b><span>${esc(booking.number_of_days ?? '')}</span></div>
+      <div><b>Pickup</b><span>${esc(booking.pickup_location)}</span></div>
+      <div><b>Drop</b><span>${esc(booking.drop_location)}</span></div>
+      <div><b>Date</b><span>${esc(booking.start_date)}</span></div>
+      <div><b>Time</b><span>${formatTime(booking.start_time)}</span></div>
+      <div><b>Passengers</b><span>${esc(booking.passengers)}</span></div>
+      <div><b>Service</b><span>${esc(booking.service_type)}</span></div>
+      <div class="wide"><b>Destinations</b><span>${esc(booking.destinations)}</span></div>
+      <div class="wide"><b>Additional Details</b><span>${esc(booking.additional_details)}</span></div>
+    </div>
+
+    <div class="actions" style="margin-top:18px;">
+      <a class="call" href="tel:${encodeURIComponent(booking.phone || '')}">📞 Call</a>
+      <button class="wa" id="detailsWhatsAppBtn">💬 WhatsApp</button>
+      ${
+        status === 'pending'
+          ? `<button class="confirm" id="detailsConfirmBtn">✓ Confirm</button>
+             <button class="reject" id="detailsRejectBtn">✕ Reject</button>`
+          : ''
+      }
+    </div>
+  `;
+
+  bookingDetailsModal.style.display = 'block';
+
+  document.getElementById('detailsWhatsAppBtn')
+    ?.addEventListener('click', () => openWhatsApp(booking, status === 'confirmed' || status === 'rejected' ? status : null));
+
+  document.getElementById('detailsConfirmBtn')
+    ?.addEventListener('click', async () => {
+      bookingDetailsModal.style.display = 'none';
+      await updateStatus(booking.id, 'confirmed');
+    });
+
+  document.getElementById('detailsRejectBtn')
+    ?.addEventListener('click', async () => {
+      bookingDetailsModal.style.display = 'none';
+      await updateStatus(booking.id, 'rejected');
+    });
+}
+
 function exportBookings() {
   if (!allBookings.length) {
     showMsg('No bookings available to export.', true);
@@ -483,6 +552,12 @@ exportBtn.addEventListener('click', exportBookings);
   );
 }
     list.addEventListener('click', async e => {
+      const viewDetails = e.target.closest('.view-details');
+      if (viewDetails) {
+        openBookingDetails(viewDetails.dataset.id);
+        return;
+      }
+
       const wa = e.target.closest('button[data-wa-status]');
       if (wa) {
         const id = wa.dataset.id;
@@ -517,6 +592,16 @@ document.getElementById('refreshReviewsBtn')
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
       location.href = 'login.html';
+    });
+
+    closeBookingDetails.addEventListener('click', () => {
+      bookingDetailsModal.style.display = 'none';
+    });
+
+    bookingDetailsModal.addEventListener('click', e => {
+      if (e.target === bookingDetailsModal) {
+        bookingDetailsModal.style.display = 'none';
+      }
     });
 
     (async () => {
