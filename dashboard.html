@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PMS Owner Dashboard</title>
   <link rel="stylesheet" href="owner.css">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body class="dashboard-page">
   <header class="topbar">
@@ -24,7 +25,7 @@
       <div class="panel-head">
         <h1>Booking Requests</h1>
         <button id="refreshBtn" class="secondary">↻ Refresh</button>
-        <button id="exportBtn" class="secondary">📥 Export Bookings</button>
+        <button id="exportBtn" class="secondary">📊 Export Excel</button>
       </div>
       <div style="display:flex; gap:10px; margin:15px 0; flex-wrap:wrap;">
   <input
@@ -364,6 +365,11 @@ function exportBookings() {
     return;
   }
 
+  if (typeof XLSX === 'undefined') {
+    showMsg('Excel export library could not be loaded. Please refresh and try again.', true);
+    return;
+  }
+
   const headers = [
     'Booking ID',
     'Customer Name',
@@ -382,48 +388,69 @@ function exportBookings() {
   ];
 
   const rows = allBookings.map(r => [
-    r.booking_code || '',
-    r.customer_name || '',
-    r.phone || '',
-    r.trip_type || '',
+    String(r.booking_code || ''),
+    String(r.customer_name || ''),
+    String(r.phone || ''),
+    String(r.trip_type || ''),
     r.number_of_days ?? '',
-    r.pickup_location || '',
-    r.drop_location || '',
-    r.start_date || '',
-    formatTime(r.start_time),
+    String(r.pickup_location || ''),
+    String(r.drop_location || ''),
+    String(r.start_date || ''),
+    String(formatTime(r.start_time) || ''),
     r.passengers ?? '',
-    r.service_type || '',
-    r.destinations || '',
-    r.additional_details || '',
-    r.status || 'pending'
+    String(r.service_type || ''),
+    String(r.destinations || ''),
+    String(r.additional_details || ''),
+    String(r.status || 'pending')
   ]);
 
-  const csv = [headers, ...rows]
-    .map(row =>
-      row.map(value =>
-        `"${String(value).replace(/"/g, '""')}"`
-      ).join(',')
-    )
-    .join('\n');
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
 
-  const blob = new Blob([csv], {
-    type: 'text/csv;charset=utf-8;'
-  });
+  // Keep phone numbers and date/time as text.
+  for (let row = 2; row <= rows.length + 1; row++) {
+    ['C', 'H', 'I'].forEach(col => {
+      const cell = ws[`${col}${row}`];
+      if (cell) {
+        cell.t = 's';
+        cell.v = String(cell.v || '');
+      }
+    });
+  }
 
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  // Professional column widths.
+  ws['!cols'] = [
+    { wch: 22 },
+    { wch: 22 },
+    { wch: 16 },
+    { wch: 14 },
+    { wch: 8 },
+    { wch: 22 },
+    { wch: 22 },
+    { wch: 14 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 24 },
+    { wch: 28 },
+    { wch: 42 },
+    { wch: 14 }
+  ];
 
-  link.href = url;
-  link.download = `PMS-Bookings-${new Date().toISOString().slice(0, 10)}.csv`;
+  // Enable Excel filter.
+  ws['!autofilter'] = {
+    ref: `A1:N${rows.length + 1}`
+  };
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Bookings');
 
-  showMsg('Bookings exported successfully.');
+  XLSX.writeFile(
+    wb,
+    `PMS-Bookings-${new Date().toISOString().slice(0, 10)}.xlsx`
+  );
+
+  showMsg('Excel file exported successfully.');
 }
-    
+
 // Search typing
 bookingSearch.addEventListener('input', renderBookings);
 
