@@ -219,6 +219,11 @@
         .insert(payload);
 
       if (error) throw error;
+      await fetch('/api/send-booking-email', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload)
+});
 
       showMessage('', '#087443');
       message.innerHTML = `Booking request submitted successfully!<br>Booking ID: <strong>${bookingCode}</strong><br>Status: <strong>Pending</strong>`;
