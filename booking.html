@@ -210,22 +210,30 @@
       }
 
       try {
-        await emailjs.send('service_qaq8a8o', 'template_lvr19pk', {
-          booking_code: payload.booking_code,
-          customer_name: payload.customer_name,
-          phone: payload.phone,
-          email: payload.email,
-          trip_type: payload.trip_type,
-          number_of_days: payload.number_of_days,
-          pickup_location: payload.pickup_location,
-          drop_location: payload.drop_location,
-          start_date: payload.start_date,
-          start_time: payload.start_time,
-          passengers: payload.passengers,
-          service_type: payload.service_type,
-          destinations: payload.destinations,
-          additional_details: payload.additional_details
-        });
+        const ownerEmailParams = {
+          booking_code: String(payload.booking_code || ''),
+          customer_name: String(payload.customer_name || ''),
+          phone: String(payload.phone || ''),
+          email: String(payload.email || ''),
+          trip_type: String(payload.trip_type || ''),
+          number_of_days: String(payload.number_of_days ?? ''),
+          pickup_location: String(payload.pickup_location || ''),
+          drop_location: String(payload.drop_location || ''),
+          start_date: String(payload.start_date || ''),
+          start_time: String(payload.start_time || ''),
+          passengers: String(payload.passengers ?? ''),
+          service_type: String(payload.service_type || ''),
+          destinations: String(payload.destinations || ''),
+          additional_details: String(payload.additional_details || '')
+        };
+
+        console.log('Sending owner booking email:', ownerEmailParams);
+        const ownerEmailResult = await emailjs.send(
+          'service_qaq8a8o',
+          'template_lvr19pk',
+          ownerEmailParams
+        );
+        console.log('Owner booking email sent:', ownerEmailResult);
       } catch (emailError) {
         console.error('Owner email notification error:', emailError);
       }
