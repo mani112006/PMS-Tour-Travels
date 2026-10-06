@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PMS Owner Login</title>
+  <title>PMS Admin Login</title>
   <link rel="stylesheet" href="owner.css">
 </head>
 <body class="auth-page">
   <main class="auth-card">
     <div class="brand">PMS TOUR &amp; TRAVELS</div>
-    <h1>Owner Login</h1>
+    <h1>Admin Login</h1>
     <p class="muted">Sign in to manage customer booking requests.</p>
     <form id="loginForm" novalidate>
-      <label>Email<input id="email" type="email" autocomplete="username" required placeholder="Owner email"></label>
+      <label>Email<input id="email" type="email" autocomplete="username" required placeholder="Admin email"></label>
       <label>Password<input id="password" type="password" autocomplete="current-password" required placeholder="Password"></label>
       <button id="loginBtn" type="submit">Login</button>
       <p id="loginMessage" class="message" role="alert"></p>
@@ -41,7 +41,7 @@
       const email = document.getElementById('email').value.trim().toLowerCase();
       const password = document.getElementById('password').value;
       if (!email || !password) { msg.textContent = 'Enter email and password.'; return; }
-      if (email !== OWNER_EMAIL) { msg.textContent = 'This account is not authorized as PMS owner.'; return; }
+      if (email !== OWNER_EMAIL) { msg.textContent = 'This account is not authorized as PMS admin.'; return; }
       btn.disabled = true; btn.textContent = 'Signing in...';
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) {
