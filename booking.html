@@ -234,6 +234,7 @@
         await emailjs.send('service_qaq8a8o', 'template_f996eat', {
           email: payload.email,
           customer_name: payload.customer_name,
+          status: 'PENDING',
           booking_code: payload.booking_code,
           trip_type: payload.trip_type,
           pickup_location: payload.pickup_location,
