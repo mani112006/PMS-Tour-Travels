@@ -13,6 +13,29 @@
 .fare-card{position:sticky;top:88px;background:#f8fafc}.fare-card h3{margin:0 0 10px;font-size:17px}.fare-values{margin-top:14px;line-height:2;font-weight:700;font-size:14px}.fare-total{margin-top:10px;padding:12px;border-radius:10px;background:#eaf2ff;color:#0b3c82;font-size:18px;font-weight:800}
 #calculateCabFareBtn{width:100%;margin-top:10px}.route-map-card #bookingMap{margin-top:10px}
 @media(max-width:850px){.route-fare-layout{grid-template-columns:1fr}.fare-card{position:static}#bookingMap{height:300px}}
+/* Booking page responsive cleanup: give the form enough room for a side-by-side map and fare card. */
+section .container.booking{width:min(1180px,calc(100% - 32px));max-width:1180px;display:grid;grid-template-columns:minmax(220px,.72fr) minmax(0,1.6fr);gap:24px;align-items:start}
+#bookingForm{min-width:0;width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+#bookingForm>label{min-width:0;margin:0}
+#bookingForm input,#bookingForm select,#bookingForm textarea{box-sizing:border-box;max-width:100%;width:100%}
+#bookingForm .full{grid-column:1/-1}
+.route-fare-layout{grid-template-columns:minmax(0,1.7fr) minmax(230px,.85fr);gap:14px}
+.route-map-card,.fare-card{min-width:0}
+#bookingMap{height:340px}
+.fare-card{position:sticky;top:88px;align-self:start}
+@media(max-width:1000px){
+  section .container.booking{grid-template-columns:1fr;max-width:760px}
+  #bookingForm{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .route-fare-layout{grid-template-columns:minmax(0,1.5fr) minmax(220px,1fr)}
+}
+@media(max-width:650px){
+  section .container.booking{width:calc(100% - 24px);gap:16px}
+  #bookingForm{grid-template-columns:1fr}
+  #bookingForm .full{grid-column:1}
+  .route-fare-layout{grid-template-columns:1fr}
+  .fare-card{position:static}
+  #bookingMap{height:280px;min-height:260px}
+}
 </style>
 <link rel="icon" href="assets/pms-logo.png">
 <title>PMS Tour & Travels | Book Your Ride</title>
@@ -177,7 +200,22 @@
       if(pickupMarker){map.removeLayer(pickupMarker);pickupMarker=null;}
       if(dropMarker){map.removeLayer(dropMarker);dropMarker=null;}
       points.forEach((item,i)=>{const label=item.kind==='pickup'?'Pickup':item.kind==='drop'?'Final Destination':'Stop '+(i);const marker=L.marker(item.point).addTo(map).bindPopup(label+': '+item.name);previewMarkers.push(marker);if(item.kind==='pickup')pickupMarker=marker;if(item.kind==='drop')dropMarker=marker;});
-      if(points.length>1){const group=L.featureGroup(previewMarkers);map.fitBounds(group.getBounds().pad(.18),{maxZoom:12});}else map.setView(points[0].point,12);
+      if(points.length>1){
+        const group=L.featureGroup(previewMarkers);
+        map.fitBounds(group.getBounds().pad(.18),{maxZoom:12});
+        /* Show the driving route preview as soon as typed locations resolve. */
+        try{
+          const coords=points.map(item=>item.point[1]+','+item.point[0]).join(';');
+          const routeRes=await fetch('https://router.project-osrm.org/route/v1/driving/'+coords+'?overview=full&geometries=geojson&steps=false');
+          if(routeRes.ok){
+            const routeData=await routeRes.json();
+            if(routeData.code==='Ok'&&routeData.routes?.length){
+              routeLayer=L.geoJSON(routeData.routes[0].geometry,{style:{color:'#1769e0',weight:5,opacity:.85}}).addTo(map);
+              map.fitBounds(routeLayer.getBounds(),{padding:[20,20],maxZoom:12});
+            }
+          }
+        }catch(routePreviewError){console.warn('Route preview unavailable:',routePreviewError);}
+      }else map.setView(points[0].point,12);
     }catch(e){say('Location map preview: address-ஐ சரிபார்க்கவும். '+(e.message||''),true);}
   }
   function scheduleMapPreview(){clearTimeout(previewTimer);previewTimer=setTimeout(previewTypedLocations,700);}
