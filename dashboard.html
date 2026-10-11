@@ -24,6 +24,27 @@
       <div class="stat" style="border-left:4px solid #dc2626;"><span>Cancelled</span><strong id="cancelledCount">0</strong></div>
     </section>
 
+    <!-- New cab fare settings panel; existing booking features remain unchanged. -->
+    <section class="panel" id="cabRatesPanel" style="margin-top:16px;">
+      <div class="panel-head">
+        <h1>🚗 Cab Fare Settings</h1>
+        <button id="refreshCabRateBtn" class="secondary" type="button">↻ Refresh Rate</button>
+      </div>
+      <p class="small">Suzuki Ertiga Tour M rate. Save changes here to store the rate in Supabase.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:620px;">
+        <label style="display:block;">Rate per KM (₹)
+          <input id="cabRatePerKm" type="number" min="1" max="1000" step="0.5" value="18" style="display:block;width:100%;margin-top:6px;padding:12px;border:1px solid #cbd5e1;border-radius:8px;">
+        </label>
+        <label style="display:block;">Minimum fare (₹)
+          <input id="cabMinimumFare" type="number" min="0" max="100000" step="1" value="300" style="display:block;width:100%;margin-top:6px;padding:12px;border:1px solid #cbd5e1;border-radius:8px;">
+        </label>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+        <button id="saveCabRateBtn" type="button">💾 Save Cab Rate</button>
+      </div>
+      <p id="cabRateMessage" class="message" aria-live="polite"></p>
+      <p class="small">This saves the rate in the <code>cab_rates</code> Supabase table. The cab booking page must also read this table for customer fares to update.</p>
+    </section>
 
     <section id="cancellationAlert" class="panel" style="margin-top:16px; cursor:pointer;" onclick="location.href='cancellations.html'">
       <div class="panel-head">
@@ -223,6 +244,73 @@ function formatTime(time) {
       msg.className = 'message' + (bad ? ' error' : '');
     }
     function statusClass(s) { return String(s || 'pending').toLowerCase(); }
+
+    // Separate cab_rates table keeps existing Booking records untouched.
+    const cabRateMessage = document.getElementById('cabRateMessage');
+    const cabRatePerKmInput = document.getElementById('cabRatePerKm');
+    const cabMinimumFareInput = document.getElementById('cabMinimumFare');
+
+    async function loadCabRate() {
+      cabRateMessage.textContent = 'Loading cab rate...';
+      const { data, error } = await supabaseClient
+        .from('cab_rates')
+        .select('vehicle_name, rate_per_km, minimum_fare')
+        .eq('vehicle_name', 'Suzuki Ertiga Tour M')
+        .maybeSingle();
+      if (error) {
+        cabRateMessage.textContent = 'Could not load rate. Create the cab_rates table and policies first.';
+        cabRateMessage.className = 'message error';
+        return;
+      }
+      if (data) {
+        cabRatePerKmInput.value = Number(data.rate_per_km ?? 18);
+        cabMinimumFareInput.value = Number(data.minimum_fare ?? 300);
+        cabRateMessage.textContent = 'Current rate loaded from Supabase.';
+      } else {
+        cabRatePerKmInput.value = 18;
+        cabMinimumFareInput.value = 300;
+        cabRateMessage.textContent = 'No saved rate yet. Default values are shown; click Save Cab Rate to store them.';
+      }
+      cabRateMessage.className = 'message';
+    }
+
+    async function saveCabRate() {
+      const rate = Number(cabRatePerKmInput.value);
+      const minimum = Number(cabMinimumFareInput.value);
+      if (!Number.isFinite(rate) || rate <= 0 || rate > 1000) {
+        cabRateMessage.textContent = 'Enter a rate greater than ₹0 and no more than ₹1000 per KM.';
+        cabRateMessage.className = 'message error';
+        return;
+      }
+      if (!Number.isFinite(minimum) || minimum < 0 || minimum > 100000) {
+        cabRateMessage.textContent = 'Enter a valid minimum fare between ₹0 and ₹100000.';
+        cabRateMessage.className = 'message error';
+        return;
+      }
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session || session.user.email?.toLowerCase() !== OWNER_EMAIL.toLowerCase()) {
+        cabRateMessage.textContent = 'Owner login required to change the cab rate.';
+        cabRateMessage.className = 'message error';
+        return;
+      }
+      cabRateMessage.textContent = 'Saving...';
+      const { error } = await supabaseClient.from('cab_rates').upsert({
+        vehicle_name: 'Suzuki Ertiga Tour M',
+        rate_per_km: rate,
+        minimum_fare: minimum,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'vehicle_name' });
+      if (error) {
+        cabRateMessage.textContent = 'Save failed: ' + error.message;
+        cabRateMessage.className = 'message error';
+        return;
+      }
+      cabRateMessage.textContent = `Saved successfully: ₹${rate}/km; minimum fare ₹${minimum}.`;
+      cabRateMessage.className = 'message';
+    }
+
+    document.getElementById('saveCabRateBtn').addEventListener('click', saveCabRate);
+    document.getElementById('refreshCabRateBtn').addEventListener('click', loadCabRate);
 
     function whatsappNumber(phone) {
       let digits = String(phone || '').replace(/\D/g, '');
@@ -866,6 +954,7 @@ document.getElementById('refreshReviewsBtn')
   await loadBookings();
   await loadReviews();
   await loadCancellationRequests();
+  await loadCabRate();
 }
     })();
   </script>
