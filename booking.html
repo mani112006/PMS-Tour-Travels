@@ -7,12 +7,14 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-#bookingMap{height:360px;width:100%;border-radius:12px;border:1px solid #cbd5e1;z-index:1;min-height:300px}.map-hint{font-size:13px;color:#64748b;line-height:1.5}
-.route-fare-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr);gap:18px;align-items:start;margin:14px 0 20px}
-.route-map-card,.fare-card{min-width:0;padding:16px;border:1px solid #dbe3ef;border-radius:14px;background:#fff;box-shadow:0 4px 16px rgba(15,35,70,.06)}
-.fare-card{position:sticky;top:88px;background:#f8fafc}.fare-card h3{margin:0 0 10px;font-size:17px}.fare-values{margin-top:14px;line-height:2;font-weight:700;font-size:14px}.fare-total{margin-top:10px;padding:12px;border-radius:10px;background:#eaf2ff;color:#0b3c82;font-size:18px;font-weight:800}
-#calculateCabFareBtn{width:100%;margin-top:10px}.route-map-card #bookingMap{margin-top:10px}
-@media(max-width:850px){.route-fare-layout{grid-template-columns:1fr}.fare-card{position:static}#bookingMap{height:300px}}
+#bookingMap{height:520px;min-height:420px;width:100%;border-radius:14px;border:1px solid #cbd5e1;z-index:1}
+.map-hint{font-size:13px;color:#64748b;line-height:1.5}
+.route-planner{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.85fr);gap:18px;align-items:start;width:100%}
+.route-map-card,.fare-card{padding:16px;border:1px solid #dbe3ef;border-radius:16px;background:#fff;box-shadow:0 5px 18px rgba(15,35,70,.06);min-width:0}
+.fare-card{background:#f8fafc;position:sticky;top:90px}
+.fare-card h3{margin-top:0}.fare-total{display:block;background:#eaf2ff;color:#123b79;padding:12px;border-radius:10px;font-size:20px;font-weight:800;margin-top:12px}
+.stop-help{font-size:12px;color:#64748b;margin:5px 0 10px}
+@media(max-width:900px){.route-planner{grid-template-columns:1fr}.fare-card{position:static}#bookingMap{height:420px;min-height:360px}}
 </style>
 <link rel="icon" href="assets/pms-logo.png">
 <title>PMS Tour & Travels | Book Your Ride</title>
@@ -62,27 +64,26 @@
 <option value="7">7 Days</option><option value="8-15">8–15 Days</option><option value="15+">15+ Days</option>
 </select></label>
 
-<label>Pickup Location<input id="pickup" required placeholder="Example: Ariyalur"></label>
-<label>Final Destination<input id="drop" required placeholder="Example: Chennai" autocomplete="off"></label>
-<label class="full">Intermediate Stops (optional)<textarea id="routeStops" rows="2" placeholder="Type stop names only, separated by commas or new lines. Example: Trichy, Thanjavur, Pondicherry"></textarea><small style="color:#64748b;">Stops are visited in the order entered. Round Trip automatically adds the pickup location as the final return stop.</small></label>
-<div class="full route-fare-layout">
+<div class="full route-planner" style="margin:8px 0 18px;">
   <div class="route-map-card">
-    <h3 style="margin:0 0 6px">🗺️ Trip Route Map</h3>
-    <p class="map-hint">Pickup, destination அல்லது stop பெயரை type செய்து field-இலிருந்து வெளியே வந்தால் map அந்த இடத்தைக் காட்டும். முழு route மற்றும் fare-க்கு Calculate அழுத்தவும்.</p>
-    <div id="bookingMap" aria-label="Pickup and drop map"></div>
-    <p class="map-hint">Map data © OpenStreetMap contributors. Address search இணைய இணைப்பைப் பொறுத்தது.</p>
+    <p class="map-hint">🗺️ Pickup / Drop field-ல் ஊர் பெயரை type செய்யலாம் அல்லது map-ல் click செய்து தேர்வு செய்யலாம். Map click செய்த இடத்தின் பெயர் field-ல் தானாக வரும்.</p>
+    <label>Pickup Location<input id="pickup" required placeholder="Example: Ariyalur" autocomplete="off"></label>
+    <label>Intermediate Stops / இடைப்பட்ட இடங்கள்<textarea id="routeStops" rows="2" placeholder="Example: Trichy, Dindigul, Madurai (comma separated)"></textarea></label>
+    <p class="stop-help">பல இடங்கள் இருந்தால் comma வைத்து பிரிக்கவும். Best available driving route-ஐ தேர்வு செய்ய முயற்சிக்கும்.</p>
+    <label>Final Drop Location<input id="drop" required placeholder="Example: Chennai" autocomplete="off"></label>
+    <div id="bookingMap" aria-label="Pickup, stop and drop route map"></div>
+    <p class="map-hint">Map data © OpenStreetMap contributors. Route estimate traffic / road closures-ஐ நேரடியாகக் கணக்கிடாது.</p>
   </div>
   <div class="fare-card" id="cabFarePanel">
-    <h3>🚕 Cab Fare Estimate</h3>
-    <p style="font-size:13px;color:#64748b;margin:0">Suzuki Ertiga Tour M · Owner-set rate</p>
-    <button class="submit" id="calculateCabFareBtn" type="button">Calculate Distance &amp; Fare</button>
-    <div class="fare-values">
-      <div>Distance: <span id="cabDistance">--</span></div>
-      <div>Rate: ₹<span id="cabRate">18</span>/km</div>
-      <div>Waiting charge: ₹<span id="cabWaitingRate">2</span>/minute</div>
-    </div>
-    <div class="fare-total">Estimated fare: ₹<span id="cabEstimatedTotal">--</span></div>
-    <p id="cabFareMessage" role="status" aria-live="polite" style="font-size:13px;color:#64748b;margin-bottom:0"></p>
+    <h3>🚕 Cab Fare Estimate</h3><p style="font-size:13px;color:#64748b;">Suzuki Ertiga Tour M · Owner-set rate</p>
+    <button class="submit" id="calculateCabFareBtn" type="button">Calculate Best Route &amp; Fare</button>
+    <div style="margin-top:12px;line-height:1.9;font-weight:700;">
+      Route distance: <span id="cabDistance">--</span><br>
+      Rate: ₹<span id="cabRate">18</span>/km<br>
+      Waiting charge: ₹<span id="cabWaitingRate">2</span>/minute
+      <span class="fare-total">Estimated travel fare: ₹<span id="cabEstimatedTotal">--</span></span>
+    </div><p id="cabFareMessage" role="status" aria-live="polite" style="font-size:13px;color:#64748b;"></p>
+    <p class="stop-help">Waiting charge is calculated separately from actual waiting time; it is not added unless the waiting duration is known.</p>
   </div>
 </div>
 <label>Starting Date<input id="date" required type="date"></label>
@@ -140,65 +141,19 @@
   const VEHICLE='Suzuki Ertiga Tour M';
   const defaults={rate:18,minimum:300,waitingRate:2};
   const $=id=>document.getElementById(id);
-  const ui={pickup:$('pickup'),drop:$('drop'),stops:$('routeStops'),tripType:$('trip_type'),button:$('calculateCabFareBtn'),distance:$('cabDistance'),rate:$('cabRate'),waitingRate:$('cabWaitingRate'),total:$('cabEstimatedTotal'),message:$('cabFareMessage')};
+  const ui={pickup:$('pickup'),drop:$('drop'),stops:$('routeStops'),button:$('calculateCabFareBtn'),distance:$('cabDistance'),rate:$('cabRate'),waitingRate:$('cabWaitingRate'),total:$('cabEstimatedTotal'),message:$('cabFareMessage')};
   const state={...defaults}; window.PMS_CAB_FARE=null;
-  let map=null,pickupMarker=null,dropMarker=null,routeLayer=null,previewMarkers=[],nextMapPoint='pickup',previewTimer=null;
+  let map=null,markers=[],routeLayer=null,nextMapPoint='pickup';
   function say(text,bad=false){ui.message.textContent=text;ui.message.style.color=bad?'#b42318':'#64748b';}
   function getConfig(){let url=window.SUPABASE_URL||'',key=window.SUPABASE_PUBLISHABLE_KEY||window.SUPABASE_ANON_KEY||'';try{if(!url&&typeof SUPABASE_URL!=='undefined')url=SUPABASE_URL;if(!key&&typeof SUPABASE_PUBLISHABLE_KEY!=='undefined')key=SUPABASE_PUBLISHABLE_KEY;if(!key&&typeof SUPABASE_ANON_KEY!=='undefined')key=SUPABASE_ANON_KEY;}catch(_){}return {url:String(url).replace(/\/$/,''),key:String(key)};}
   async function loadSettings(){const {url,key}=getConfig();if(!url||!key)throw Error('Supabase config URL/key கிடைக்கவில்லை.');const endpoint=url+'/rest/v1/cab_rates?vehicle_name=eq.'+encodeURIComponent(VEHICLE)+'&select=rate_per_km,minimum_fare,waiting_charge_per_minute&limit=1';const res=await fetch(endpoint,{headers:{apikey:key,Authorization:'Bearer '+key}});if(!res.ok)throw Error('Cab rates load ஆகவில்லை ('+res.status+').');const rows=await res.json();if(!rows.length)throw Error('cab_rates-ல் vehicle row இல்லை.');const r=rows[0];Object.assign(state,{rate:Number(r.rate_per_km),minimum:Number(r.minimum_fare),waitingRate:Number(r.waiting_charge_per_minute??2)});if(!Number.isFinite(state.rate)||state.rate<=0||!Number.isFinite(state.minimum)||state.minimum<0||!Number.isFinite(state.waitingRate)||state.waitingRate<0)throw Error('Cab rate settings தவறாக உள்ளது.');ui.rate.textContent=state.rate.toLocaleString('en-IN');ui.waitingRate.textContent=state.waitingRate.toLocaleString('en-IN');}
   function resetEstimate(msg){window.PMS_CAB_FARE=null;ui.distance.textContent='--';ui.total.textContent='--';if(routeLayer&&map){map.removeLayer(routeLayer);routeLayer=null;}if(msg)say(msg);}
-  function setMarker(which,point){const marker=L.marker(point).addTo(map).bindPopup(which==='pickup'?'Pickup':'Drop');if(which==='pickup'){if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=marker;ui.pickup.value=point[0].toFixed(5)+', '+point[1].toFixed(5);}else{if(dropMarker)map.removeLayer(dropMarker);dropMarker=marker;ui.drop.value=point[0].toFixed(5)+', '+point[1].toFixed(5);}}
-  function initMap(){if(!window.L)throw Error('Map library load ஆகவில்லை. Internet connection சரிபார்க்கவும்.');map=L.map('bookingMap').setView([11.14,79.08],9);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);map.on('click',e=>{const pt=[e.latlng.lat,e.latlng.lng];setMarker(nextMapPoint,pt);nextMapPoint=nextMapPoint==='pickup'?'drop':'pickup';resetEstimate(nextMapPoint==='drop'?'Pickup selected. இப்போது map-ல் drop இடத்தை click செய்யவும்.':'Pickup மற்றும் drop தேர்வு முடிந்தது. Calculate Distance & Fare அழுத்தவும்.');});setTimeout(()=>map.invalidateSize(),250);}
-  async function locate(text){text=text.trim();if(!text)throw Error('Pickup மற்றும் drop இரண்டையும் உள்ளிடவும்.');const m=text.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);if(m){const lat=+m[1],lon=+m[2];if(lat < -90||lat>90||lon < -180||lon>180)throw Error('Coordinates தவறு.');return [lat,lon];}const res=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(text),{headers:{'Accept-Language':'en'}});if(!res.ok)throw Error('Location search service unavailable.');const rows=await res.json();if(!rows.length)throw Error('Location கிடைக்கவில்லை: '+text);return [+rows[0].lat,+rows[0].lon];}
-  async function previewTypedLocations(){
-    if(!map)return;
-    const entries=[['pickup',ui.pickup.value.trim()],['drop',ui.drop.value.trim()]];
-    const stopNames=(ui.stops.value||'').split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);
-    stopNames.forEach((name,i)=>entries.push(['stop'+i,name]));
-    const valid=entries.filter(x=>x[1]);
-    if(!valid.length)return;
-    try{
-      const points=[];
-      for(const [kind,name] of valid){points.push({kind,name,point:await locate(name)});}
-      if(routeLayer){map.removeLayer(routeLayer);routeLayer=null;}
-      previewMarkers.forEach(m=>map.removeLayer(m));previewMarkers=[];
-      if(pickupMarker){map.removeLayer(pickupMarker);pickupMarker=null;}
-      if(dropMarker){map.removeLayer(dropMarker);dropMarker=null;}
-      points.forEach((item,i)=>{const label=item.kind==='pickup'?'Pickup':item.kind==='drop'?'Final Destination':'Stop '+(i);const marker=L.marker(item.point).addTo(map).bindPopup(label+': '+item.name);previewMarkers.push(marker);if(item.kind==='pickup')pickupMarker=marker;if(item.kind==='drop')dropMarker=marker;});
-      if(points.length>1){const group=L.featureGroup(previewMarkers);map.fitBounds(group.getBounds().pad(.18),{maxZoom:12});}else map.setView(points[0].point,12);
-    }catch(e){say('Location map preview: address-ஐ சரிபார்க்கவும். '+(e.message||''),true);}
-  }
-  function scheduleMapPreview(){clearTimeout(previewTimer);previewTimer=setTimeout(previewTypedLocations,700);}
-  async function calculate(){
-    ui.button.disabled=true;ui.button.textContent='Calculating...';say('All stops route மற்றும் fare கணக்கிடப்படுகிறது...');
-    try{
-      await loadSettings();
-      const pickupName=ui.pickup.value.trim(),dropName=ui.drop.value.trim();
-      if(!pickupName||!dropName)throw Error('Pickup மற்றும் final destination இரண்டையும் உள்ளிடவும்.');
-      const stopNames=(ui.stops.value||'').split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);
-      const names=[pickupName,...stopNames,dropName];
-      if(ui.tripType.value==='Round Trip')names.push(pickupName);
-      const uniqueCheck=names.map(x=>x.toLowerCase());
-      if(names.length<2)throw Error('குறைந்தது pickup மற்றும் destination தேவை.');
-      if(!map)throw Error('Map initialize ஆகவில்லை. Refresh செய்யவும்.');
-      const points=[];
-      for(const name of names)points.push(await locate(name));
-      for(let i=1;i<points.length;i++)if(points[i][0]===points[i-1][0]&&points[i][1]===points[i-1][1])throw Error('அடுத்தடுத்த route locations ஒரே இடமாக உள்ளது: '+names[i]);
-      const coordString=points.map(p=>p[1]+','+p[0]).join(';');
-      const res=await fetch('https://router.project-osrm.org/route/v1/driving/'+coordString+'?overview=full&geometries=geojson&steps=false');
-      if(!res.ok)throw Error('Driving route service unavailable.');
-      const data=await res.json();if(data.code!=='Ok'||!data.routes?.length)throw Error('முழு driving route கிடைக்கவில்லை. Stop names சரிபார்க்கவும்.');
-      const route=data.routes[0],km=route.distance/1000,travel=Math.max(state.minimum,Math.ceil(km*state.rate));
-      if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry).addTo(map);
-      if(pickupMarker)map.removeLayer(pickupMarker);if(dropMarker)map.removeLayer(dropMarker);
-      points.forEach((pt,i)=>L.marker(pt).addTo(map).bindPopup((i===0?'Pickup':i===points.length-1?(ui.tripType.value==='Round Trip'?'Return to Pickup':'Final Destination'):'Stop '+i)+': '+names[i]));
-      map.fitBounds(routeLayer.getBounds(),{padding:[20,20]});
-      ui.distance.textContent=km.toFixed(1)+' km';ui.total.textContent=travel.toLocaleString('en-IN');
-      window.PMS_CAB_FARE={vehicleName:VEHICLE,distanceKm:+km.toFixed(2),ratePerKm:state.rate,waitingMinutes:null,waitingRatePerMinute:state.waitingRate,waitingCharge:null,travelFare:travel,estimatedTotal:travel,routeStops:stopNames,routeNames:names,tripType:ui.tripType.value};
-      say('முழு route தயார்: '+names.join(' → ')+'. Waiting charge actual waiting time-க்கு ₹'+state.waitingRate+'/minute தனியாக கணக்கிடப்படும்.');
-    }catch(e){window.PMS_CAB_FARE=null;say(e.message||'Fare calculate செய்ய முடியவில்லை.',true);}finally{ui.button.disabled=false;ui.button.textContent='Calculate Distance & Fare';}
-  }
-  ui.button.addEventListener('click',calculate);[ui.pickup,ui.drop,ui.stops].forEach(x=>{x.addEventListener('input',()=>{resetEstimate('Location மாற்றப்பட்டுள்ளது. Fare மீண்டும் calculate செய்யவும்.');scheduleMapPreview();});x.addEventListener('change',scheduleMapPreview);x.addEventListener('blur',scheduleMapPreview);});ui.tripType.addEventListener('input',()=>resetEstimate('Trip type மாற்றப்பட்டது. Fare மீண்டும் calculate செய்யவும்.'));ui.tripType.addEventListener('change',()=>resetEstimate('Trip type மாற்றப்பட்டது. Fare மீண்டும் calculate செய்யவும்.'));try{initMap();}catch(e){say(e.message,true);}loadSettings().then(()=>say('Owner-set rate loaded. Pickup/drop type செய்தால் map preview update ஆகும்.')).catch(e=>say(e.message,true));
+  async function reverseName(pt){try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+pt[0]+'&lon='+pt[1]+'&zoom=14&addressdetails=1',{headers:{'Accept-Language':'en'}});if(r.ok){const d=await r.json();return d.name||d.address?.suburb||d.address?.town||d.address?.city||d.address?.village||d.display_name?.split(',').slice(0,2).join(',')||pt.join(', ');}}catch(_){}return pt[0].toFixed(5)+', '+pt[1].toFixed(5);}
+  async function setMapPoint(pt){const which=nextMapPoint;const name=await reverseName(pt);if(which==='pickup')ui.pickup.value=name;else if(which==='drop')ui.drop.value=name;else{const prior=ui.stops.value.split(',').map(x=>x.trim()).filter(Boolean);prior.push(name);ui.stops.value=prior.join(', ');}nextMapPoint=which==='pickup'?'drop':which==='drop'?'stop':'stop';resetEstimate('Map location added: '+name+'. Fare மீண்டும் calculate செய்யவும்.');}
+  function initMap(){if(!window.L)throw Error('Map library load ஆகவில்லை. Internet connection சரிபார்க்கவும்.');map=L.map('bookingMap').setView([11.14,79.08],8);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);map.on('click',e=>setMapPoint([e.latlng.lat,e.latlng.lng]));setTimeout(()=>map.invalidateSize(),350);}
+  async function locate(text){text=text.trim();if(!text)throw Error('Pickup, intermediate stops (if any), and drop உள்ளிடவும்.');const m=text.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);if(m){const lat=+m[1],lon=+m[2];if(lat < -90||lat>90||lon < -180||lon>180)throw Error('Coordinates தவறு.');return {point:[lat,lon],name:text};}const res=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(text),{headers:{'Accept-Language':'en'}});if(!res.ok)throw Error('Location search service unavailable.');const rows=await res.json();if(!rows.length)throw Error('Location கிடைக்கவில்லை: '+text);return {point:[+rows[0].lat,+rows[0].lon],name:rows[0].display_name?.split(',').slice(0,3).join(',')||text};}
+  async function calculate(){ui.button.disabled=true;ui.button.textContent='Finding best route...';say('Locations search செய்து driving route கணக்கிடப்படுகிறது...');try{await loadSettings();const stopNames=ui.stops.value.split(',').map(x=>x.trim()).filter(Boolean);if(stopNames.length>8)throw Error('அதிகபட்சம் 8 intermediate stops மட்டும் சேர்க்கவும்.');const locations=[await locate(ui.pickup.value),...await Promise.all(stopNames.map(locate)),await locate(ui.drop.value)];const coords=locations.map(x=>x.point[1]+','+x.point[0]).join(';');if(new Set(coords.split(';')).size!==locations.length)throw Error('ஒரே location பலமுறை சேர்க்கப்பட்டுள்ளது.');if(!map)throw Error('Map initialize ஆகவில்லை. Refresh செய்யவும்.');const tripUrl='https://router.project-osrm.org/trip/v1/driving/'+coords+'?roundtrip=false&source=first&destination=last&overview=full&geometries=geojson';const res=await fetch(tripUrl);if(!res.ok)throw Error('Driving route service unavailable.');const data=await res.json();if(data.code!=='Ok'||!data.trips?.length)throw Error('இந்த எல்லா இடங்களுக்கும் driving route கிடைக்கவில்லை. Location பெயர்களைச் சரிபார்க்கவும்.');const trip=data.trips[0],km=trip.distance/1000,travel=Math.max(state.minimum,Math.ceil(km*state.rate));if(routeLayer)map.removeLayer(routeLayer);markers.forEach(m=>map.removeLayer(m));markers=[];routeLayer=L.geoJSON(trip.geometry,{style:{weight:5}}).addTo(map);locations.forEach((loc,i)=>{const label=(i===0?'Pickup: ':i===locations.length-1?'Final Drop: ':'Stop '+i+': ')+loc.name;markers.push(L.marker(loc.point).addTo(map).bindPopup(label));});map.fitBounds(routeLayer.getBounds(),{padding:[28,28]});ui.distance.textContent=km.toFixed(1)+' km';ui.total.textContent=travel.toLocaleString('en-IN');const ordered=data.waypoints?.map(w=>w.waypoint_index);window.PMS_CAB_FARE={vehicleName:VEHICLE,distanceKm:+km.toFixed(2),ratePerKm:state.rate,waitingMinutes:null,waitingRatePerMinute:state.waitingRate,waitingCharge:null,travelFare:travel,estimatedTotal:travel,routeStops:stopNames,routeOrder:ordered,tripType:$('trip_type').value};say('Best available route estimate தயார். '+locations.length+' locations route-ல் சேர்க்கப்பட்டுள்ளன. Waiting charge actual waiting time-க்கு ₹'+state.waitingRate+'/minute தனியாக கணக்கிடப்படும்.');}catch(e){say(e.message||'Fare calculate செய்ய முடியவில்லை.',true);}finally{ui.button.disabled=false;ui.button.textContent='Calculate Best Route & Fare';}}
+  ui.button.addEventListener('click',calculate);[ui.pickup,ui.drop,ui.stops].forEach(x=>x.addEventListener('input',()=>resetEstimate('Locations மாற்றப்பட்டுள்ளன. Fare மீண்டும் calculate செய்யவும்.')));try{initMap();}catch(e){say(e.message,true);}loadSettings().then(()=>say('Owner-set rate loaded. Pickup/drop type செய்யவும்; map click செய்தால் location name தானாக வரும்.')).catch(e=>say(e.message,true));
 })();
 </script>
 
@@ -269,7 +224,6 @@
     }
 
     const daysRaw = val('number_of_days');
-    if (!window.PMS_CAB_FARE) { showMessage('Please calculate the full route distance and fare before submitting your booking.', '#b42318'); document.getElementById('calculateCabFareBtn').focus(); return; }
     const bookingCode = makeBookingCode();
     const payload = {
       customer_name: val('name'),
@@ -283,7 +237,7 @@
       start_time: val('time'),
       passengers,
       service_type: val('service'),
-      destinations: [val('destinations'), (window.PMS_CAB_FARE?.routeNames?.length ? 'Calculated route: ' + window.PMS_CAB_FARE.routeNames.join(' → ') : ''), (window.PMS_CAB_FARE?.routeStops?.length ? 'Intermediate stops: ' + window.PMS_CAB_FARE.routeStops.join(', ') : '')].filter(Boolean).join('\n'),
+      destinations: [val('destinations'), val('routeStops') ? 'Route stops: ' + val('routeStops') : ''].filter(Boolean).join(' | '),
       additional_details: val('details'),
       booking_code: bookingCode,
       distance_km: window.PMS_CAB_FARE?.distanceKm ?? null,
